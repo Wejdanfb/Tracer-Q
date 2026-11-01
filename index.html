@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#3F5B8D">
-<title>Nursing Tracer Quiz</title>
+<title>Nursing Tracer Assessment Tool</title>
 <style>
   :root{
     /* Palette taken from the BT Timer tool (BT-timer-WB / index.html) */
@@ -288,6 +288,112 @@
   .footer-link:hover { color: var(--primary); text-decoration: underline; }
   .footer-link:focus-visible { outline: 2px solid var(--primary); }
 
+  /* ---------- Setup ---------- */
+  .text-input {
+    display:block; width:100%; padding: 13px 14px; font: inherit; font-size: 15px; color: var(--text);
+    border: 1.5px solid var(--border); border-radius: 10px; background: #fff;
+  }
+  .text-input:focus { outline: 2px solid var(--primary-light); outline-offset: 1px; border-color: var(--primary-light); }
+  .mode-grid { grid-template-columns: repeat(2, 1fr); margin-top: 0; }
+  .field-block .dept-grid { margin-top: 0; }
+  span.lbl { display:block; font-size: 14px; font-weight: 600; color: var(--primary-deep); margin-bottom: 8px; }
+
+  /* ---------- Assessment header ---------- */
+  .meta-row { display:flex; justify-content: space-between; align-items: center; gap: 8px 14px; flex-wrap: wrap; margin-top: 8px; }
+  .meta-row .dept-line { margin-top: 0; }
+  .stopwatch {
+    font-size: 13px; color: var(--muted); background: var(--primary-tint); border-radius: 999px; padding: 4px 12px;
+    font-variant-numeric: tabular-nums;
+  }
+  .stopwatch b { color: var(--primary-deep); font-size: 14px; letter-spacing: .3px; }
+
+  /* ---------- Interviewer mode ---------- */
+  .expected {
+    border: 1px solid var(--border); border-left: 4px solid var(--secondary-plum); background: var(--plum-tint);
+    border-radius: 12px; padding: 14px 16px; margin-top: 4px;
+  }
+  .expected-label { font-size: 12px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: var(--secondary-plum); margin-bottom: 6px; }
+  .expected-label span { text-transform: none; letter-spacing: 0; font-weight: 600; color: var(--muted); margin-left: 6px; }
+  .expected-text { font-size: 15px; line-height: 1.6; color: var(--text); white-space: pre-line; }
+  .eval { margin-top: 16px; }
+  .eval-label { font-size: 13px; font-weight: 700; color: var(--primary-deep); margin-bottom: 8px; }
+  .eval-row { display:grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .eval-btn {
+    padding: 14px 10px; border-radius: 12px; font-weight: 700; font-size: 14.5px; letter-spacing: .3px;
+    background: #fff; border: 1.5px solid var(--border); color: var(--text); transition: background .12s, border-color .12s;
+  }
+  .eval-btn.met { color: var(--completed); }
+  .eval-btn.partial { color: var(--warn-amber); }
+  .eval-btn.notmet { color: var(--missed); }
+  .eval-btn:hover { border-color: var(--primary-light); }
+  .eval-btn.met.selected { background: var(--completed); border-color: var(--completed); color: #fff; }
+  .eval-btn.partial.selected { background: #b07a12; border-color: #b07a12; color: #fff; }
+  .eval-btn.notmet.selected { background: var(--missed); border-color: var(--missed); color: #fff; }
+
+  /* ---------- Report ---------- */
+  .report-actions .btn-grid + .btn-grid { margin-top: 10px; }
+  .btn-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+  .btn-grid .btn-primary { margin-top: 0; padding: 14px; font-size: 16px; }
+  .report { padding: 28px 24px; }
+  .rp-head { text-align: center; padding-bottom: 16px; border-bottom: 2px solid var(--primary); }
+  .rp-title { margin: 0; font-size: 22px; color: var(--primary-deep); letter-spacing: .2px; }
+  .rp-sub { margin: 6px 0 0; font-size: 15px; color: var(--secondary-plum); font-weight: 700; }
+  .rp-sec { margin-top: 24px; }
+  .rp-sec > h2 { font-size: 16px; color: var(--primary-deep); margin: 0 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+  .rp-info { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .rp-info th { text-align: left; width: 40%; color: var(--muted); font-weight: 600; padding: 7px 10px 7px 0; border-bottom: 1px solid #f0edf7; }
+  .rp-info td { padding: 7px 0; color: var(--text); font-weight: 600; border-bottom: 1px solid #f0edf7; }
+  .rp-sum { display:grid; gap: 14px; }
+  .rp-sum-block h3 { font-size: 13px; color: var(--muted); margin: 0 0 6px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
+  .rp-tiles { display:grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .rp-tile { background: var(--primary-tint); border-radius: 10px; padding: 10px 8px; text-align: center; }
+  .rp-tile b { display:block; font-size: 20px; color: var(--primary-deep); }
+  .rp-tile span { font-size: 12px; color: var(--muted); }
+  .rp-tile.met { background: var(--completed-bg); } .rp-tile.met b { color: var(--completed); }
+  .rp-tile.partial { background: var(--warn-amber-bg); } .rp-tile.partial b { color: var(--warn-amber); }
+  .rp-tile.notmet { background: var(--missed-bg); } .rp-tile.notmet b { color: var(--missed); }
+  .rp-note { font-size: 12.5px; color: var(--muted); line-height: 1.5; margin: 10px 0 0; }
+  .rp-table-wrap { overflow-x: auto; }
+  .rp-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  .rp-table th { text-align: left; background: var(--primary-tint); color: var(--primary-deep); font-weight: 700; padding: 8px 10px; font-size: 12.5px; }
+  .rp-table td { padding: 9px 10px; border-bottom: 1px solid #ece8f5; vertical-align: top; }
+  .rp-table td.num, .rp-table th:nth-child(n+2) { text-align: center; }
+  .rp-detail th:first-child, .rp-table th:first-child { text-align: left; }
+  .rp-table tr.flag-row.partial td { background: #fff8e8; }
+  .rp-table tr.flag-row.notmet td { background: #fdf0ee; }
+  .std-cell { font-weight: 700; color: var(--primary-deep); white-space: nowrap; }
+  .badge { display:inline-block; font-size: 11.5px; font-weight: 800; letter-spacing: .3px; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+  .badge.met { background: var(--completed-bg); color: var(--completed); border: 1px solid #b9d8a6; }
+  .badge.partial { background: var(--warn-amber-bg); color: var(--warn-amber); border: 1px solid var(--warn-amber-border); }
+  .badge.notmet { background: var(--missed-bg); color: var(--missed); border: 1px solid #e3aaa4; }
+  .rp-allmet { background: var(--completed-bg); color: var(--completed); border-radius: 10px; padding: 12px 14px; font-weight: 600; margin: 0; }
+  .rp-action { border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; margin-top: 10px; }
+  .rp-action-head { display:flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .rp-action ul { margin: 8px 0 0; padding-left: 0; list-style: none; }
+  .rp-action li { font-size: 13.5px; line-height: 1.5; padding: 5px 0; border-top: 1px dashed #ece8f5; }
+  .rp-action li .badge { margin-right: 4px; }
+  .rp-std { margin-top: 18px; break-inside: auto; }
+  .rp-std-head { display:flex; justify-content: space-between; align-items: center; gap: 8px 14px; flex-wrap: wrap; margin-bottom: 8px; }
+  .rp-std-head h3 { margin: 0; font-size: 15px; color: var(--primary-deep); }
+  .rp-std-ov { font-size: 13px; color: var(--muted); font-weight: 600; }
+  .q-main { font-weight: 600; color: var(--primary-deep); line-height: 1.45; }
+  .q-extra { margin-top: 6px; font-size: 12.5px; line-height: 1.5; color: var(--text); }
+  .q-extra small { display:block; font-size: 10.5px; font-weight: 700; letter-spacing: .4px; text-transform: uppercase; color: var(--secondary-plum); }
+  .rp-foot { margin: 26px 0 0; padding-top: 10px; border-top: 1px solid var(--border); font-size: 11px; color: #8f889f; text-align: center; }
+
+  @media print {
+    @page { size: A4; margin: 14mm 12mm; }
+    html, body { background: #fff !important; }
+    body * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    header.topbar, footer.site-footer, .no-print, #modal { display: none !important; }
+    main { max-width: none; padding: 0; }
+    .card.report { box-shadow: none; border: none; padding: 0; margin: 0; }
+    .rp-table-wrap { overflow: visible; }
+    .rp-table tr, .rp-action, .rp-tile { break-inside: avoid; }
+    .rp-std-head, .rp-sec > h2 { break-after: avoid; }
+    .rp-table thead { display: table-header-group; }
+  }
+
   @media (max-width: 520px) {
     main { padding: 16px 16px 8px; }
     .card { padding: 20px 16px; }
@@ -295,28 +401,31 @@
     .opt { font-size: 14.5px; padding: 12px; }
     .stat b, .tile b { font-size: 20px; }
     .home-title { font-size: 21px; }
-    .dept-grid { grid-template-columns: 1fr; }
+    .dept-grid, .mode-grid { grid-template-columns: 1fr; }
+    .eval-row { grid-template-columns: 1fr; }
+    .btn-grid { grid-template-columns: 1fr; }
+    .rp-tiles { grid-template-columns: repeat(2, 1fr); }
   }
 </style>
 </head>
 <body>
 <div id="app">
   <header class="topbar">
-    <h1>Nursing Tracer Quiz</h1>
-    <p>Practice and Review Nursing Tracer Questions</p>
+    <h1>Nursing Tracer Assessment Tool</h1>
+    <p>Practice, assess and report Nursing Tracer Questions</p>
   </header>
 
   <main>
     <!-- ================= HOME ================= -->
     <section id="homeScreen">
       <div class="card">
-        <h2 class="home-title">Nursing Tracer Quiz</h2>
-        <p class="home-sub">Practice and Review Nursing Tracer Questions</p>
+        <h2 class="home-title">Nursing Tracer Assessment Tool</h2>
+        <p class="home-sub">Self-assessment practice and interviewer-led tracer assessments, with a report by standard.</p>
 
         <div class="stat-row">
-          <div class="stat"><b id="statTotal">0</b><span>Questions</span></div>
-          <div class="stat"><b id="statMcq">0</b><span>Multiple Choice</span></div>
-          <div class="stat"><b id="statTf">0</b><span>True / False</span></div>
+          <div class="stat"><b id="statStd">0</b><span>Standards</span></div>
+          <div class="stat"><b id="statSelf">0</b><span>Self-Assessment questions</span></div>
+          <div class="stat"><b id="statInt">0</b><span>Interviewer questions</span></div>
         </div>
 
         <div class="field-block">
@@ -324,20 +433,31 @@
           <select id="countSelect"></select>
         </div>
         <div class="field-block">
-          <label class="check"><input type="checkbox" id="shuffleChk" checked> Shuffle question order</label>
+          <label class="check"><input type="checkbox" id="shuffleChk" checked> Shuffle question order (Self-Assessment)</label>
         </div>
 
-        <button class="btn-primary" id="startBtn">Start Quiz</button>
+        <button class="btn-primary" id="startBtn">Start Assessment</button>
       </div>
     </section>
 
-    <!-- ================= DEPARTMENT ================= -->
-    <section id="deptScreen" class="hidden">
+    <!-- ================= ASSESSMENT SETUP ================= -->
+    <section id="setupScreen" class="hidden">
       <div class="card">
-        <h2 class="home-title">Select Department</h2>
-        <p class="home-sub">Choose a department to start the quiz.</p>
-        <div class="dept-grid" id="deptGrid" role="radiogroup" aria-label="Department"></div>
-        <button class="btn-primary" id="beginBtn" disabled>Select a department</button>
+        <h2 class="home-title">New Assessment</h2>
+        <p class="home-sub">Enter the department being assessed, then choose the assessment mode and question set.</p>
+        <div class="field-block">
+          <label class="lbl" for="deptNameInput">Department Name</label>
+          <input type="text" id="deptNameInput" class="text-input" maxlength="80" autocomplete="off" placeholder="e.g. P3AB, NICU, PICU, ER, Labor &amp; Delivery">
+        </div>
+        <div class="field-block">
+          <span class="lbl">Assessment Mode</span>
+          <div class="dept-grid mode-grid" id="modeGrid" role="radiogroup" aria-label="Assessment mode"></div>
+        </div>
+        <div class="field-block">
+          <span class="lbl">Question Set</span>
+          <div class="dept-grid" id="deptGrid" role="radiogroup" aria-label="Question set"></div>
+        </div>
+        <button class="btn-primary" id="beginBtn" disabled>Enter the department name</button>
         <button class="btn-secondary btn-block" id="deptBackBtn" type="button">Back</button>
       </div>
     </section>
@@ -349,7 +469,10 @@
           <span class="q-count" id="qCount"></span>
           <span class="chip" id="qType"></span>
         </div>
-        <div class="dept-line">Department: <b class="deptName"></b></div>
+        <div class="meta-row">
+          <div class="dept-line">Department: <b class="deptName"></b> · <span class="modeName"></span> · <span class="setName"></span></div>
+          <div class="stopwatch" aria-label="Elapsed time"><span>Elapsed</span> <b id="timerText">00:00:00</b></div>
+        </div>
         <div class="progress-wrap">
           <div class="progress-label"><span>Progress</span><span id="progressText"></span></div>
           <div class="progress" role="progressbar" aria-label="Answered questions" aria-valuemin="0" id="progressBar"><div id="progressFill"></div></div>
@@ -359,6 +482,18 @@
       <div class="card q-card" id="qCard">
         <p class="q-text" id="qText"></p>
         <div class="options" id="qOptions"></div>
+        <div class="expected hidden" id="expectedBox">
+          <div class="expected-label">Expected answer <span>for the assessor only</span></div>
+          <div class="expected-text" id="expectedText"></div>
+        </div>
+        <div class="eval hidden" id="evalBox" role="radiogroup" aria-label="Evaluation">
+          <div class="eval-label">Evaluation</div>
+          <div class="eval-row">
+            <button type="button" class="eval-btn met" data-result="MET" role="radio">MET</button>
+            <button type="button" class="eval-btn partial" data-result="PARTIAL" role="radio">PARTIALLY MET</button>
+            <button type="button" class="eval-btn notmet" data-result="NOT_MET" role="radio">NOT MET</button>
+          </div>
+        </div>
         <div class="q-tools">
           <button class="flag-btn" id="flagBtn" type="button" aria-pressed="false">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22V4"/><path d="M4 4h12l-2 4 2 4H4"/></svg>
@@ -370,44 +505,25 @@
           <button class="btn-secondary" id="prevBtn" type="button">Previous</button>
           <button class="btn-secondary btn-next" id="nextBtn" type="button">Next</button>
         </div>
-      </div>
-
-      <div class="card navigator">
-        <h3>Questions</h3>
-        <div class="nav-grid" id="navGrid"></div>
-        <div class="legend">
-          <span><i style="background:var(--primary-tint)"></i>Answered</span>
-          <span><i style="background:#fff;border:1.5px solid var(--border)"></i>Not answered</span>
-          <span><i style="background:var(--accent-mauve);border-radius:50%"></i>Marked for review</span>
-        </div>
-        <button class="finish-link" id="finishLink" type="button">Finish Quiz</button>
+        <button class="finish-link" id="finishBtn" type="button">Finish Assessment</button>
       </div>
     </section>
 
-    <!-- ================= RESULTS ================= -->
-    <section id="resultsScreen" class="hidden">
-      <div class="card score-hero">
-        <div class="ring">
-          <svg viewBox="0 0 120 120" aria-hidden="true">
-            <circle cx="60" cy="60" r="52" fill="none" stroke="#E9EDF5" stroke-width="12"/>
-            <circle id="ringArc" cx="60" cy="60" r="52" fill="none" stroke="#3F5B8D" stroke-width="12" stroke-linecap="round" stroke-dasharray="326.73" stroke-dashoffset="326.73"/>
-          </svg>
-          <div class="pct"><b id="resPct">0%</b><span>Percentage</span></div>
+    <!-- ================= REPORT ================= -->
+    <section id="reportScreen" class="hidden">
+      <div class="card no-print report-actions">
+        <div class="btn-grid">
+          <button class="btn-primary" id="printBtn" type="button">Print Report</button>
+          <button class="btn-primary" id="pdfBtn" type="button">Save as PDF</button>
         </div>
-        <p class="dept-line">Department: <b class="deptName"></b></p>
-        <p class="score-line">Final Score: <span id="resScore"></span></p>
-        <p class="score-sub" id="resSub"></p>
-        <div class="tiles">
-          <div class="tile ok"><b id="resCorrect">0</b><span>Correct</span></div>
-          <div class="tile bad"><b id="resIncorrect">0</b><span>Incorrect</span></div>
-          <div class="tile skip"><b id="resSkipped">0</b><span>Unanswered</span></div>
-        </div>
-        <div class="btn-stack">
-          <button class="btn-primary" id="reviewBtn">Review Answers</button>
-          <button class="btn-secondary" id="retakeBtn">Retake Quiz</button>
-          <button class="btn-secondary" id="homeBtn">Back to Home</button>
+        <div class="btn-grid">
+          <button class="btn-secondary" id="reviewBtn" type="button">Review Answers</button>
+          <button class="btn-secondary" id="retakeBtn" type="button">Retake Assessment</button>
+          <button class="btn-secondary" id="newBtn" type="button">New Assessment</button>
+          <button class="btn-secondary" id="homeBtn" type="button">Back to Home</button>
         </div>
       </div>
+      <article class="card report" id="reportDoc"></article>
     </section>
 
     <!-- ================= REVIEW ================= -->
@@ -419,7 +535,7 @@
       </div>
       <div id="reviewList"></div>
       <div class="btn-stack">
-        <button class="btn-secondary" id="backToResultsBtn">Back to Results</button>
+        <button class="btn-secondary" id="backToResultsBtn">Back to Report</button>
         <button class="btn-secondary" id="reviewHomeBtn">Back to Home</button>
       </div>
     </section>
@@ -460,17 +576,18 @@ const CONTACT = {
 };
 
 /* =====================================================================
-   QUESTION BANK
-   Source: Tracer Questions (Word document).
-   `ref` is an internal identifier only — it is NEVER shown in the UI.
-   `areas` = department label(s) exactly as written next to the question
-   in the Word document; [] = no label in the source (general question).
+   QUESTION BANK — SELF-ASSESSMENT ITEMS
+   Source: Tracer Questions (Word document) + edit document, plus questions
+   imported from TRACER.QQ.xlsx (q36–q39).
+   `ref`   internal identifier only — NEVER shown in the UI.
+   `excel` the matching entry in EXCEL_QUESTIONS below, which carries the
+           standard number (STD.NO) and department classification (DEP.).
    type: "mcq" | "tf" | "multi"  (multi = "Select all that apply")
    fixedOrder: true keeps the options in the document's order (used where an
    option such as "All of the above" depends on position).
    ===================================================================== */
 const QUESTION_BANK = [
-  { id: "q01", ref: "KSAMC-IPP-281 Q1", areas: ["OPD-Day Care"], type: "mcq",
+  { id: "q01", ref: "KSAMC-IPP-281 Q1", excel: "x01", type: "mcq",
     text: "What are the three types of patient admission, and when is each type considered?",
     options: [
       { id: "a", text: "Planned admission: OPD/day-care cases; unplanned admission: urgent cases within 24 hours; emergent admission: requires immediate attention." },
@@ -479,7 +596,7 @@ const QUESTION_BANK = [
       { id: "d", text: "Planned admission: requires immediate attention; unplanned admission: OPD/day-care cases; emergent admission: urgent cases within 24 hours." }
     ] },
 
-  { id: "q02", ref: "KSAMC-IPP-281 Q2", areas: ["ER"], type: "mcq",
+  { id: "q02", ref: "KSAMC-IPP-281 Q2", excel: "x02", type: "mcq",
     text: "What should the nurse do when no bed is available, and how should a boarder patient be managed?",
     options: [
       { id: "a", text: "The patient may require referral to another health facility through Tansiq; a boarder patient should be managed according to the patient's clinical status." },
@@ -488,7 +605,7 @@ const QUESTION_BANK = [
       { id: "d", text: "The patient may require referral through Tansiq; a boarder patient is managed according to the admitting unit's census." }
     ] },
 
-  { id: "q03", ref: "KSAMC-DPP-NUR-017 Q1", areas: ["All"], type: "mcq",
+  { id: "q03", ref: "KSAMC-DPP-NUR-017 Q1", excel: "x03", type: "mcq",
     text: "What are the five moments of hand hygiene?",
     options: [
       { id: "a", text: "Before touching the patient; before a clean/aseptic procedure; after body-fluid exposure; after touching the patient; and after touching the patient's surroundings." },
@@ -497,7 +614,7 @@ const QUESTION_BANK = [
       { id: "d", text: "Before touching the patient; before a clean/aseptic procedure; after body-fluid exposure; after touching the patient; and before leaving the hospital." }
     ] },
 
-  { id: "q04", ref: "KSAMC-DPP-NUR-017 Q2", areas: ["All"], type: "multi", fixedOrder: true,
+  { id: "q04", ref: "KSAMC-DPP-NUR-017 Q2", excel: "x04", type: "multi", fixedOrder: true,
     text: "Which of the following are the correct recommended durations for hand hygiene?",
     options: [
       { id: "a", text: "Hand rubbing: 20–30 seconds." },
@@ -506,7 +623,7 @@ const QUESTION_BANK = [
       { id: "d", text: "Hand washing: 20–30 seconds." }
     ] },
 
-  { id: "q05", ref: "KSAMC-IPP-322 Q1", areas: ["All"], type: "mcq",
+  { id: "q05", ref: "KSAMC-IPP-322 Q1", excel: "x05", type: "mcq",
     text: "What should you do when you receive a verbal physician order?",
     options: [
       { id: "a", text: "Repeat the order back to the physician to confirm it and write/document the order according to the physician-order process." },
@@ -515,7 +632,7 @@ const QUESTION_BANK = [
       { id: "d", text: "Carry out the order and document it only at the end of the shift." }
     ] },
 
-  { id: "q06", ref: "KSAMC-CPP-031 Q1", areas: ["In-Patient", "ER"], type: "mcq",
+  { id: "q06", ref: "KSAMC-CPP-031 Q1", excel: "x07", type: "mcq",
     text: "What is the nurse's role when obtaining informed consent?",
     options: [
       { id: "a", text: "The nurse acts as a witness to the patient's signature and follows the policy requirements when the patient cannot sign." },
@@ -524,10 +641,10 @@ const QUESTION_BANK = [
       { id: "d", text: "The nurse has no role in the informed-consent process." }
     ] },
 
-  { id: "q07", ref: "KSAMC-CPP-031 Q1 (emergency)", areas: ["In-Patient", "ER"], type: "tf",
+  { id: "q07", ref: "KSAMC-CPP-031 Q1 (emergency)", excel: "x07", type: "tf",
     text: "When obtaining informed consent in case of emergency: 2 privileged doctors, one of them the MRP or the physician performing." },
 
-  { id: "q09", ref: "KSAMC-IPP-359 Q1", areas: [], type: "mcq",
+  { id: "q09", ref: "KSAMC-IPP-359 Q1", excel: "x09", type: "mcq",
     text: "If a physician does not respond to a non-urgent call, what is the escalation process?",
     options: [
       { id: "a", text: "Make three attempts. If there is no response within three hours, escalate to the supervisor; if no response, escalate through the supervisor to the Director on Duty / Nursing Office according to the physician-calling process." },
@@ -536,7 +653,7 @@ const QUESTION_BANK = [
       { id: "d", text: "Make two attempts. If there is no response within three hours, escalate to the Nursing Office, bypassing the supervisor." }
     ] },
 
-  { id: "q10", ref: "KSAMC-IPP-282 Q1", areas: [], type: "mcq",
+  { id: "q10", ref: "KSAMC-IPP-282 Q1", excel: "x14", type: "mcq",
     text: "When should discharge planning begin?",
     options: [
       { id: "a", text: "As soon as possible after admission." },
@@ -545,7 +662,7 @@ const QUESTION_BANK = [
       { id: "d", text: "After all treatments are completed." }
     ] },
 
-  { id: "q11", ref: "KSAMC-IPP-264 Q1", areas: ["In-Patient"], type: "mcq", fixedOrder: true,
+  { id: "q11", ref: "KSAMC-IPP-264 Q1", excel: "x15", type: "mcq", fixedOrder: true,
     text: "According to CTAS, what is the expected physician response time for a Category III (Urgent) patient?",
     options: [
       { id: "a", text: "Immediately." },
@@ -554,7 +671,7 @@ const QUESTION_BANK = [
       { id: "d", text: "Within 60–120 minutes." }
     ] },
 
-  { id: "q12", ref: "QM.2 / QM.10 Q1", areas: [], type: "mcq",
+  { id: "q12", ref: "QM.2 / QM.10 Q1", excel: "x16", type: "mcq",
     text: "What is a KPI, and which relevant nursing or unit-specific KPIs are monitored in your department?",
     options: [
       { id: "a", text: "Key Performance Indicator; measurable indicators used to monitor performance and quality of care." },
@@ -563,7 +680,7 @@ const QUESTION_BANK = [
       { id: "d", text: "Key Performance Inspection; a tool used only for staff evaluation." }
     ] },
 
-  { id: "q13", ref: "KSAMC-CPP-018 Q1", areas: [], type: "mcq",
+  { id: "q13", ref: "KSAMC-CPP-018 Q1", excel: "x17", type: "mcq",
     text: "What are sentinel events?",
     options: [
       { id: "a", text: "Unexpected events, including patient abduction, discharge/handing of a newborn or infant to the wrong family, staff suicide or attempted suicide, and a medication error causing severe temporary harm or death." },
@@ -572,7 +689,7 @@ const QUESTION_BANK = [
       { id: "d", text: "Unexpected events limited to patient falls without injury." }
     ] },
 
-  { id: "q14", ref: "KSAMC-CPP-023 Q1", areas: [], type: "mcq",
+  { id: "q14", ref: "KSAMC-CPP-023 Q1", excel: "x18", type: "mcq",
     text: "What identifiers do you use to verify a patient's identity?",
     options: [
       { id: "a", text: "At least the patient's full name and MRN." },
@@ -581,7 +698,7 @@ const QUESTION_BANK = [
       { id: "d", text: "The patient's diagnosis and attending physician." }
     ] },
 
-  { id: "q15", ref: "KSAMC-IPP-245 Q1", areas: ["Surgical"], type: "mcq",
+  { id: "q15", ref: "KSAMC-IPP-245 Q1", excel: "x20", type: "mcq",
     text: "What must be verified before a surgical procedure, and who is responsible for site marking?",
     options: [
       { id: "a", text: "Verify the patient's identity, procedure and informed consent. The surgical site is marked before transfer; the performing surgeon marks surgical procedures, and the anesthesiologist and assigned nurse verify the site marking." },
@@ -590,7 +707,7 @@ const QUESTION_BANK = [
       { id: "d", text: "Verify the patient's identity, procedure and informed consent. The site is marked in the operating room; the assigned nurse marks the site, and the surgeon verifies the marking." }
     ] },
 
-  { id: "q16", ref: "Fall risk Q1", areas: [], type: "mcq",
+  { id: "q16", ref: "Fall risk Q1", excel: "x21", type: "mcq",
     text: "Which fall-risk assessment tools are used for adult and pediatric patients, and when should the assessment be completed?",
     options: [
       { id: "a", text: "Morse Scale for adults and Humpty Dumpty Falls Scale for pediatric patients. Assess within two hours of admission and reassess at the beginning of every shift." },
@@ -599,7 +716,7 @@ const QUESTION_BANK = [
       { id: "d", text: "Braden Scale for both adult and pediatric patients. Assess within two hours of admission and reassess at the beginning of every shift." }
     ] },
 
-  { id: "q17", ref: "Fall risk — universal interventions", areas: [], type: "mcq", fixedOrder: true,
+  { id: "q17", ref: "Fall risk — universal interventions", excel: "x22", type: "mcq", fixedOrder: true,
     text: "Which of the following are universal fall prevention interventions that should be implemented for all patients, regardless of their fall risk?",
     options: [
       { id: "a", text: "Orient the patient to the environment and keep essential items within reach." },
@@ -608,7 +725,7 @@ const QUESTION_BANK = [
       { id: "d", text: "All of the above." }
     ] },
 
-  { id: "q18", ref: "Fall risk Q2", areas: [], type: "mcq",
+  { id: "q18", ref: "Fall risk Q2", excel: "x23", type: "mcq",
     text: "What are the immediate actions required after a patient fall?",
     options: [
       { id: "a", text: "Assess the patient, notify the doctor and head/charge nurse, complete an OVR, and reassess fall risk." },
@@ -617,7 +734,7 @@ const QUESTION_BANK = [
       { id: "d", text: "Document the fall at the end of the shift without reassessing the patient." }
     ] },
 
-  { id: "q19", ref: "Pressure ulcer Q1", areas: [], type: "mcq",
+  { id: "q19", ref: "Pressure ulcer Q1", excel: "x24", type: "mcq",
     text: "Which tool is used to assess pressure-ulcer risk, and when should it be reassessed?",
     options: [
       { id: "a", text: "The Braden Scale. Reassessment is performed every shift within the first four hours as required." },
@@ -626,7 +743,7 @@ const QUESTION_BANK = [
       { id: "d", text: "The Braden Scale. Reassessment is performed only on admission and at discharge." }
     ] },
 
-  { id: "q20", ref: "Pressure ulcer Q2", areas: [], type: "multi", fixedOrder: true,
+  { id: "q20", ref: "Pressure ulcer Q2", excel: "x25", type: "multi", fixedOrder: true,
     text: "Which of the following are key pressure-ulcer prevention and documentation measures?",
     options: [
       { id: "a", text: "Reposition the patient regularly and use pressure-relieving surfaces." },
@@ -637,7 +754,7 @@ const QUESTION_BANK = [
       { id: "f", text: "All of the above." }
     ] },
 
-  { id: "q21", ref: "PC.5.3, 5.4 Q1", areas: [], type: "mcq",
+  { id: "q21", ref: "PC.5.3, 5.4 Q1", excel: "x26", type: "mcq",
     text: "If a non-Arabic-speaking patient is admitted, how would you communicate with the patient and where can you find the approved translator list?",
     options: [
       { id: "a", text: "Use the approved interpreter/translation process and access the translator list available in the unit." },
@@ -646,7 +763,7 @@ const QUESTION_BANK = [
       { id: "d", text: "Request the translator list from the Employee Health Clinic." }
     ] },
 
-  { id: "q22", ref: "KSAMC-CPP-030 Q1", areas: [], type: "mcq",
+  { id: "q22", ref: "KSAMC-CPP-030 Q1", excel: "x27", type: "mcq",
     text: "You started a blood transfusion 10 minutes ago. The patient suddenly develops chills, fever and back pain. What would you do?",
     options: [
       { id: "a", text: "Stop the blood first → assess VS → notify physician → maintain IV access → recheck patient/blood → follow reaction protocol/Blood Bank → document/report." },
@@ -655,7 +772,7 @@ const QUESTION_BANK = [
       { id: "d", text: "Stop the blood → remove the IV access → discard the blood bag → notify physician → document/report." }
     ] },
 
-  { id: "q23", ref: "KSAMC-CPP-030 Q2", areas: [], type: "mcq",
+  { id: "q23", ref: "KSAMC-CPP-030 Q2", excel: "x28", type: "mcq",
     text: "During a blood transfusion, how often do you monitor vital signs?",
     options: [
       { id: "a", text: "Baseline → close observation first 15 min → q15 min first hour → q30 min next 2 hours → hourly → end of unit." },
@@ -664,7 +781,7 @@ const QUESTION_BANK = [
       { id: "d", text: "Baseline → close observation first 15 min → q15 min first hour → hourly next 2 hours → q30 min → end of unit." }
     ] },
 
-  { id: "q24", ref: "KSAMC-IPP-251 Q1", areas: ["In-Patient"], type: "mcq",
+  { id: "q24", ref: "KSAMC-IPP-251 Q1", excel: "x29", type: "mcq",
     text: "What is the minimum and maximum time for Out On Pass?",
     options: [
       { id: "a", text: "6 hours, and not more than 24 hours." },
@@ -673,10 +790,10 @@ const QUESTION_BANK = [
       { id: "d", text: "24 hours, and not more than 72 hours." }
     ] },
 
-  { id: "q25", ref: "KSAMC-IPP-251 Q2", areas: ["In-Patient"], type: "tf",
+  { id: "q25", ref: "KSAMC-IPP-251 Q2", excel: "x30", type: "tf",
     text: "If the patient on Out On Pass does not come back after the timeframe, LAMA should be done by the nurse." },
 
-  { id: "q26", ref: "KSAMC-CPP-036 Q1", areas: [], type: "mcq",
+  { id: "q26", ref: "KSAMC-CPP-036 Q1", excel: "x31", type: "mcq",
     text: "What should you do after confirming suspected abuse or neglect?",
     options: [
       { id: "a", text: "Notify the Medical City Protection Team according to the Child & Adult Abuse and Neglect Policy." },
@@ -685,7 +802,7 @@ const QUESTION_BANK = [
       { id: "d", text: "Document the finding only, without notifying anyone." }
     ] },
 
-  { id: "q27", ref: "Codes Q1", areas: [], type: "mcq",
+  { id: "q27", ref: "Codes Q1", excel: "x32", type: "mcq",
     text: "Which of the following correctly matches the emergency codes with their meanings?",
     options: [
       { id: "a", text: "Code White: Physical aggression/fight; Code Black: Bomb threat; Code Yellow: Disaster; Code Pink: Kidnapping." },
@@ -694,7 +811,7 @@ const QUESTION_BANK = [
       { id: "d", text: "Code White: Bomb threat; Code Black: Kidnapping; Code Yellow: Fire; Code Pink: Disaster." }
     ] },
 
-  { id: "q29", ref: "KSAMC-PLAN-EDP-001 Q1", areas: [], type: "mcq",
+  { id: "q29", ref: "KSAMC-PLAN-EDP-001 Q1", excel: "x33", type: "mcq",
     text: "What does RACE stand for during a fire emergency?",
     options: [
       { id: "a", text: "Rescue anyone in immediate danger; Activate the fire alarm and alert others; Contain the fire if possible by closing doors/windows; Evacuate the area/building safely." },
@@ -703,7 +820,7 @@ const QUESTION_BANK = [
       { id: "d", text: "Remove equipment; Activate the fire alarm; Close the unit; Exit the building." }
     ] },
 
-  { id: "q30", ref: "KSAMC-PLAN-EDP-001 Q2", areas: [], type: "mcq",
+  { id: "q30", ref: "KSAMC-PLAN-EDP-001 Q2", excel: "x34", type: "mcq",
     text: "What does PASS stand for when using a fire extinguisher?",
     options: [
       { id: "a", text: "Pull the pin; Aim at the base of the fire; Squeeze the handle/lever; Sweep from side to side at the base of the fire." },
@@ -712,7 +829,7 @@ const QUESTION_BANK = [
       { id: "d", text: "Press the alarm; Activate the extinguisher; Spray the area; Step back." }
     ] },
 
-  { id: "q31", ref: "KSAMC-IPP-014 Q1", areas: [], type: "mcq",
+  { id: "q31", ref: "KSAMC-IPP-014 Q1", excel: "x35", type: "mcq",
     text: "What does LASA medication mean, and which practices help prevent medication errors involving LASA medications?",
     options: [
       { id: "a", text: "Look-Alike/Sound-Alike medications; use Tall Man lettering where applicable, use generic and brand names as required, and separate LASA medications from their LASA pairs." },
@@ -721,7 +838,7 @@ const QUESTION_BANK = [
       { id: "d", text: "Look-Alike/Sound-Alike medications; store similar medications together to make them easier to access." }
     ] },
 
-  { id: "q32", ref: "KSAMC-IPP-014 Q2", areas: [], type: "mcq",
+  { id: "q32", ref: "KSAMC-IPP-014 Q2", excel: "x36", type: "mcq",
     text: "What is High Alert Medication?",
     options: [
       { id: "a", text: "Medication causing harm to the patient — perform an independent double-check, use the required red auxiliary labels, and store high-alert medications securely." },
@@ -730,7 +847,7 @@ const QUESTION_BANK = [
       { id: "d", text: "Any medication given by verbal order — store it with routine ward stock." }
     ] },
 
-  { id: "q33", ref: "KSAMC-IPP-041 Q1", areas: [], type: "mcq",
+  { id: "q33", ref: "KSAMC-IPP-041 Q1", excel: "x13", type: "mcq",
     text: "Which of the following represents the ten rights of medication administration?",
     options: [
       { id: "a", text: "Right patient, right medication, right dose, right route, right time, right documentation, right assessment, right education, right evaluation, and right to refuse." },
@@ -739,13 +856,47 @@ const QUESTION_BANK = [
       { id: "d", text: "Right patient, right medication, right route, right physician, and right pharmacy." }
     ] },
 
-  { id: "q35", ref: "AMC-IPP-199 Q1", areas: [], type: "mcq",
+  { id: "q35", ref: "AMC-IPP-199 Q1", excel: "x06", type: "mcq",
     text: "What should you do immediately after a needle-stick injury or blood/body-fluid exposure?",
     options: [
       { id: "a", text: "Wash the injury with soap and water, report the exposure, and seek the appropriate medical evaluation." },
       { id: "b", text: "Cover the injury and continue working without reporting it." },
       { id: "c", text: "Wait until the end of the shift before seeking medical attention." },
       { id: "d", text: "Apply an antiseptic only and report the incident if symptoms develop." }
+    ] },
+
+  /* ---- Imported from TRACER.QQ.xlsx (new questions; answer key = Excel answer) ---- */
+  { id: "q36", ref: "Excel MM.20 Q1", excel: "x10", type: "mcq",
+    text: "Can patients use their own medications during their hospital stay?",
+    options: [
+      { id: "a", text: "No, unless prescribed by the treating physician or the medication is unavailable in the hospital pharmacy and no alternative is available." },
+      { id: "b", text: "Yes, patients may use any of their own medications at any time." },
+      { id: "c", text: "Yes, as long as a family member brings the medications." },
+      { id: "d", text: "No, never, under any circumstances." }
+    ] },
+  { id: "q37", ref: "Excel MM.20 Q2", excel: "x11", type: "mcq",
+    text: "Is the nurse allowed to keep the patient's own medications in the patient's room or medication room?",
+    options: [
+      { id: "a", text: "No. The medications must be sent to the inpatient pharmacy in a plastic bag with the Patient's Own Medication Form." },
+      { id: "b", text: "Yes, they can be kept in the patient's bedside drawer." },
+      { id: "c", text: "Yes, they can be stored in the unit medication room with the ward stock." },
+      { id: "d", text: "Yes, if they are labeled with the patient's name." }
+    ] },
+  { id: "q38", ref: "Excel MM.20 Q3", excel: "x12", type: "mcq",
+    text: "What should happen if a prescribed medication is unavailable in the hospital pharmacy but the patient has the same medication?",
+    options: [
+      { id: "a", text: "The physician must review and prescribe the patient's own medication before it can be dispensed." },
+      { id: "b", text: "The nurse may give the patient's own medication without a physician's order." },
+      { id: "c", text: "The patient may take their own medication without informing the staff." },
+      { id: "d", text: "The dose is skipped until the hospital pharmacy restocks the medication." }
+    ] },
+  { id: "q39", ref: "Excel QM.17 Q2", excel: "x19", type: "mcq",
+    text: "How is PT identification performed for a newborn?",
+    options: [
+      { id: "a", text: "Left Leg Handwritten mother's name and MRN; Right hand: Identification sticker." },
+      { id: "b", text: "Right leg: handwritten mother's name and MRN; Left hand: identification sticker." },
+      { id: "c", text: "Left leg: identification sticker; Right hand: handwritten mother's name and MRN." },
+      { id: "d", text: "An identification sticker on the crib only; no band is applied to the newborn." }
     ] }
 ];
 
@@ -790,29 +941,218 @@ const ANSWER_KEY = {
   q31: { correct: "a", answer: null },
   q32: { correct: "a", answer: "Causing harm to patient. Perform an independent double-check, use the required red auxiliary labels, and store high-alert medications securely." },
   q33: { correct: "a", answer: null },
-  q35: { correct: "a", answer: null }
+  q35: { correct: "a", answer: null },
+  q36: { correct: "a", answer: "No, unless prescribed by the treating physician or the medication is unavailable in the hospital pharmacy and no alternative is available." },
+  q37: { correct: "a", answer: "No. The medications must be sent to the inpatient pharmacy in a plastic bag with the Patient's Own Medication Form." },
+  q38: { correct: "a", answer: "The physician must review and prescribe the patient's own medication before it can be dispensed." },
+  q39: { correct: "a", answer: "Left Leg Handwritten mother's name and MRN; Right hand: Identification sticker." }
 };
 
 /* =====================================================================
-   DEPARTMENT FILTERS
-   - All:        every question.
-   - ER:         excludes questions labelled In-Patient, Day Surgery or
-                 Surgical (the source label "OPD-Day Care" is treated as
-                 the Day Surgery / day-care category) — unless the same
-                 question is also labelled ER.
-   - In-Patient: excludes questions labelled ER — unless the same
-                 question is also labelled In-Patient.
-   Questions with no label, or labelled "All", appear in every department.
+   EXCEL QUESTIONS — STANDARDS, DEPARTMENTS, INTERVIEWER MODE
+   Source: TRACER.QQ.xlsx, sheet "Tracer.Q&A" (all three column blocks).
+   std      STD.NO exactly as in the sheet (outer spaces trimmed).
+   dep      DEP. exactly as in the sheet ("" = not specified in the sheet).
+   question / answer  the Excel Q and A cells, used in Interviewer mode.
+   selfIds  the self-assessment item(s) in QUESTION_BANK for this question
+            ([] = Interviewer mode only — no safe multiple-choice version).
+   Not imported (see the reconciliation notes delivered with this version):
+     NR.3.6.3/ PFR Q1 "What is the patient Right ?" — the answer cell repeats
+       the question ("What is the right for patient ?"), so no answer exists.
+     MOI.7 Q3 abbreviations list — no answer in the sheet.
+     MM.40 MM.41 Q3 medication-error reporting — deleted from the quiz on
+       request (edit document, 12 Oct 2026); not re-added.
+   STD.NO and DEP. are internal metadata: shown only in the final report.
    ===================================================================== */
-const ER_EXCLUDED_AREAS = ["In-Patient", "Day Surgery", "Surgical", "OPD-Day Care"];
-const DEPARTMENTS = [
-  { id: "all", name: "All", desc: "Every question in the question bank.",
-    include: (q) => true },
-  { id: "er", name: "ER", desc: "Excludes In-Patient, Day Surgery and Surgical questions.",
-    include: (q) => q.areas.includes("ER") || !q.areas.some(a => ER_EXCLUDED_AREAS.includes(a)) },
-  { id: "inpatient", name: "In-Patient", desc: "Excludes ER questions.",
-    include: (q) => q.areas.includes("In-Patient") || !q.areas.includes("ER") }
+const EXCEL_QUESTIONS = [
+  { id: "x01", std: "NR.3.6.1", dep: "(OPD-Day Care)", cell: "B3",
+    question: "What are the three types of patient admission, and when is each type considered?",
+    answer: "Planned admission includes OPD/day-care cases; unplanned admission is for urgent cases within 24 hours; emergent admission requires immediate attention",
+    selfIds: ["q01"] },
+  { id: "x02", std: "NR.3.6.1", dep: "ER", cell: "B5",
+    question: "What should the nurse do when no bed is available, and how should a boarder patient be managed?",
+    answer: "If no bed is available, the patient may require referral to another health facility through Tansiq. A boarder patient should be managed according to the patient's clinical status.",
+    selfIds: ["q02"] },
+  { id: "x03", std: "NR.3.6.2", dep: "ALL", cell: "B10",
+    question: "What are the five moments of hand hygiene?",
+    answer: "Before touching the patient; before a clean/aseptic procedure; after body-fluid exposure; after touching the patient; and after touching the patient's surroundings.",
+    selfIds: ["q03"] },
+  { id: "x04", std: "NR.3.6.2", dep: "ALL", cell: "B12",  // DEP blank in the sheet: taken from Q1 of the same standard
+    question: "How long should hand rubbing and hand washing be performed?",
+    answer: "Hand rubbing should take 20–30 seconds, and hand washing should take 40–60 seconds.",
+    selfIds: ["q04"] },
+  { id: "x05", std: "NR.3.6.4", dep: "ALL", cell: "B24",
+    question: "What should you do when you receive a verbal physician order?",
+    answer: "Repeat the order back to the physician to confirm it and write/document the order according to the physician-order process.",
+    selfIds: ["q05"] },
+  { id: "x06", std: "IPC.12", dep: "ALL", cell: "B31",
+    question: "What should you do immediately after a needle-stick injury or blood/body-fluid exposure?",
+    answer: "During working hours, go directly to Employee Health Clinic. During non-working hours, notify the nurse supervisor and go to the Emergency Department. Wash percutaneous injuries with soap and water; irrigate exposed eyes with clean/sterile water and flush for 10 minutes, as applicable.",
+    selfIds: ["q35"] },
+  { id: "x07", std: "PFR.10", dep: "ALL", cell: "B38",
+    question: "What is the nurse's role when obtaining informed consent?",
+    answer: "The nurse acts as a witness to the patient's signature and follows the policy requirements when the patient cannot sign. Male representitve then female\nin case of emergancy : 2 privlages drs , one of them MRP or Physician performing .",
+    selfIds: ["q06", "q07"] },
+  { id: "x08", std: "NR. 3.6.6", dep: "ALL", cell: "B45",
+    question: "what is the correct process if there is Blood or body fluid spill.",
+    answer: "1.Restrict access to the affected area and place a wet floor sign.\n2.Wear appropriate PPE\n3.Apply the super-absorbent material and allow 3 minutes for the spill to solidify.\n4.Collect the solidified material using a scoop/scraper and dispose of it in a biohazard bag.\n5.Prepare the disinfectant solution using the sodium dichloroisocyanurate tablet and water as instructed.\n6.Disinfect the area using the disposable wiping cloth.\n7.Dispose of all used cleaning materials in the yellow biohazard bag.",
+    selfIds: [] },
+  { id: "x09", std: "NR.3.6.7", dep: "ALL", cell: "B52",
+    question: "If a physician does not respond to a non-urgent call, what is the escalation process?",
+    answer: "Make three attempts. If there is no response within three hours, escalate to the supervisor, if no response Escalate through the supervisor to the Director on Duty / Nursing Office according to the physician-calling process",
+    selfIds: ["q09"] },
+  { id: "x10", std: "MM.20", dep: "", cell: "B55",  // DEP cell is empty for this whole standard in the sheet
+    question: "Can patients use their own medications during their hospital stay?",
+    answer: "No, unless prescribed by the treating physician or the medication is unavailable in the hospital pharmacy and no alternative is available.",
+    selfIds: ["q36"] },
+  { id: "x11", std: "MM.20", dep: "", cell: "B57",  // DEP cell is empty for this whole standard in the sheet
+    question: "Is the nurse allowed to keep the patient's own medications in the patient's room or medication room?",
+    answer: "No. The medications must be sent to the inpatient pharmacy in a plastic bag with the Patient's Own Medication Form.",
+    selfIds: ["q37"] },
+  { id: "x12", std: "MM.20", dep: "", cell: "B59",  // DEP cell is empty for this whole standard in the sheet
+    question: "What should happen if a prescribed medication is unavailable in the hospital pharmacy but the patient has the same medication?",
+    answer: "The physician must review and prescribe the patient's own medication before it can be dispensed.",
+    selfIds: ["q38"] },
+  { id: "x13", std: "MM.37", dep: "ALL", cell: "E3",
+    question: "What are the ten rights of medication administration?",
+    answer: "Right patient, right drug, right dose, right time, right frequency, right route, right documentation, right to refuse, right to be educated, and right evaluation of response.",
+    selfIds: ["q33"] },
+  { id: "x14", std: "NR.3.6.9", dep: "IN-PATIENT", cell: "E10",
+    question: "When should discharge planning start ?",
+    answer: "Discharge planning starts as soon as possible after admission.",
+    selfIds: ["q10"] },
+  { id: "x15", std: "ER.8", dep: "ER ONLY", cell: "E17",
+    question: "What are the CTAS categories and the expected physician response time for each category?",
+    answer: "Category I Resuscitation: immediately; Category II Emergent: within 15 minutes; Category III Urgent: within 30 minutes; Category IV Less Urgent: within 60–120 minutes; Category V Non-urgent: more than 120 minutes.",
+    selfIds: ["q11"] },
+  { id: "x16", std: "QM.2/ QM.10", dep: "ALL", cell: "E24",
+    question: "Can you name one or more nursing or unit KPIs monitored in your department, and explain what the KPI measures?",
+    answer: "The staff should be able to identify relevant nursing/unit KPIs and explain what they measure or how performance is monitored.",
+    selfIds: ["q12"] },
+  { id: "x17", std: "QM.14/QM .15", dep: "ALL", cell: "E31",
+    question: "What sentinel events?",
+    answer: "unexpected event, include patient abduction, discharge/handing of a newborn or infant to the wrong family, staff suicide or attempted suicide, and a medication error causing severe temporary harm or death.",
+    selfIds: ["q13"] },
+  { id: "x18", std: "QM.17", dep: "ALL", cell: "E38",
+    question: "What identifiers do you use to verify a patient's identity?",
+    answer: "Use at least the patient's full name and MRN",
+    selfIds: ["q14"] },
+  { id: "x19", std: "QM.17", dep: "ALL", cell: "E40",  // DEP blank in the sheet: taken from Q1 of the same standard
+    question: "How is PT identification  performed for a newborn?",
+    answer: "Left Leg Handwritten mother's name and MRN; Right hand: Identification sticker.",
+    selfIds: ["q39"] },
+  { id: "x20", std: "QM.18", dep: "IN-PATIENT", cell: "E45",
+    question: "What must be verified before a surgical procedure, and who is responsible for site marking?",
+    answer: "Verify the patient's identity, procedure and informed consent. The surgical site is marked before transfer; the performing surgeon marks surgical procedures, and the anesthesiologist and assigned nurse verify the site marking",
+    selfIds: ["q15"] },
+  { id: "x21", std: "QM.23.1", dep: "ALL", cell: "E52",
+    question: "Which fall-risk assessment tools are used for adult and pediatric patients, and when should the assessment be completed?",
+    answer: "Use the Morse Scale for adults and the Humpty Dumpty Falls Scale for pediatric patients. Assess within two hours of admission and reassess at the beginning of every shift.",
+    selfIds: ["q16"] },
+  { id: "x22", std: "QM.23.1", dep: "ALL", cell: "E54",  // DEP blank in the sheet: taken from Q1 of the same standard
+    question: "What universal fall prevention interventions should be implemented for all patients, regardless of their fall risk?",
+    answer: "*Orient the patient to the environment;\n*keep the call bell, telephone, urinal, and bedside items within reach; keep walkways clear and dry; * keep the bed in the lowest position with brakes locked\n* raise the bedside rails;\n*assist with toileting as appropriate; and evaluate medications that may increase the risk of falls.",
+    selfIds: ["q17"] },
+  { id: "x23", std: "QM.23.1", dep: "ALL", cell: "E56",  // DEP blank in the sheet: taken from Q1 of the same standard
+    question: "What should you do after a fall or near miss, or after a significant clinical change/post-anesthesia or surgery?",
+    answer: "Assess the patient immediately, inform the MRP and head/charge nurse and supervisor, complete the OVR, and reassess fall risk. Reassessment is required within 30 minutes and every four hours for 24 hours when indicated; major injuries require the patient not to be moved and immediate vital-sign assessment/physician management.",
+    selfIds: ["q18"] },
+  { id: "x24", std: "QM.22", dep: "ALL", cell: "H3",
+    question: "Which tool is used to assess pressure-ulcer risk, and when should it be reassessed?",
+    answer: "The Braden Scale is used. Reassessment is performed every shift within the first four hours as required.",
+    selfIds: ["q19"] },
+  { id: "x25", std: "QM.22", dep: "ALL", cell: "H5",  // DEP blank in the sheet: taken from Q1 of the same standard
+    question: "What are key pressure-ulcer prevention and documentation measures?",
+    answer: "Reposition the patient, use pressure-relieving surfaces, keep skin clean and dry, consider skin barriers, educate the patient/family, document assessment/reassessment in the appropriate record, document repositioning, and follow the required seven-day reassessment and transfer/documentation process for existing ulcers.",
+    selfIds: ["q20"] },
+  { id: "x26", std: "PC.5.3, 5.4", dep: "ALL", cell: "H10",
+    question: "If a non-Arabic-speaking patient is admitted, how would you communicate with the patient and where can you find the approved translator list?",
+    answer: "Use the approved interpreter/translation process and access the translator list available in the unit.",
+    selfIds: ["q21"] },
+  { id: "x27", std: "PC.25", dep: "ALL", cell: "H17",
+    question: "You started a blood transfusion 10 minutes ago. The patient suddenly develops chills, fever and back pain. What would you do?",
+    answer: "STOP THE BLOOD FIRST → assess VS → notify physician → maintain IV access → recheck patient/blood → follow reaction protocol/Blood Bank → document/report.",
+    selfIds: ["q22"] },
+  { id: "x28", std: "PC.25", dep: "ALL", cell: "H19",  // DEP blank in the sheet: taken from Q1 of the same standard
+    question: "How often do you monitor vital signs?",
+    answer: "→ Baseline → close observation first 15 min → q15 min first hour → q30 min next 2 hours → hourly → end of unit.",
+    selfIds: ["q23"] },
+  { id: "x29", std: "PC.35", dep: "IN-PATIENT", cell: "H24",
+    question: "What is the minimum and maximum time for Out On Pass ?",
+    answer: "6 hrs and not more than 24 hrs",
+    selfIds: ["q24"] },
+  { id: "x30", std: "PC.35", dep: "IN-PATIENT", cell: "H26",  // DEP blank in the sheet: taken from Q1 of the same standard
+    question: "if the patient did not come back after timeframe ?",
+    answer: "LAMA should be done by doctor",
+    selfIds: ["q25"] },
+  { id: "x31", std: "PC.13.4", dep: "ALL", cell: "H31",
+    question: "What should you do after confirming suspected abuse or neglect?",
+    answer: "Notify the Medical City Protection Team according to the Child & Adult Abuse and Neglect Policy.",
+    selfIds: ["q26"] },
+  { id: "x32", std: "FMS", dep: "ALL", cell: "H38",
+    question: "Can you identify the emergency codes used in the hospital and what they mean?",
+    answer: "Examples include Code White: Mr. Strong/fight; Code Black: explosive threat/bomb; Code Yellow: disaster; Code Pink: kidnapping; Code Brown: utility failure; Code Orange: chemical spill greater than 100 mL; Code Silver: hostage/weapon; Code Grey: severe weather.",
+    selfIds: ["q27"] },
+  { id: "x33", std: "FMS.18", dep: "ALL", cell: "H45",
+    question: "What does RACE stand for during a fire emergency?",
+    answer: "Rescue anyone in immediate danger; Activate the fire alarm and alert others; Contain the fire if possible by closing doors/windows; Evacuate the area/building safely.",
+    selfIds: ["q29"] },
+  { id: "x34", std: "FMS.18", dep: "ALL", cell: "H47",  // DEP blank in the sheet: taken from Q1 of the same standard
+    question: "What does PASS stand for when using a fire extinguisher?",
+    answer: "Pull the pin; Aim at the base of the fire; Squeeze the handle/lever; Sweep from side to side at the base of the fire.",
+    selfIds: ["q30"] },
+  { id: "x35", std: "MM.5 & MM.6.3", dep: "ALL", cell: "H52",
+    question: "What is LASA ?",
+    answer: "Look alike\\Sound Alike Use Tall Man lettering where applicable, use generic and brand names as required, separate LASA medications from their LASA pairs",
+    selfIds: ["q31"] },
+  { id: "x36", std: "MM.5 & MM.6.3", dep: "ALL", cell: "H54",  // DEP blank in the sheet: taken from Q1 of the same standard
+    question: "What is High Alert Medication ?",
+    answer: "Causing Harm to patient Perform an independent double-check, use the required red auxiliary labels, and store high-alert medications securely",
+    selfIds: ["q32"] }
 ];
+
+/* =====================================================================
+   QUESTION SETS (department filter — uses the Excel DEP. classification)
+   - All:        every question.
+   - ER:         excludes IN-PATIENT questions and day-care / day-surgery /
+                 surgical questions (the sheet's "(OPD-Day Care)" label is
+                 treated as the Day Surgery / day-care category).
+   - In-Patient: excludes ER questions ("ER" and "ER ONLY").
+   ALL and questions whose DEP. is not specified appear in every set.
+   ===================================================================== */
+function depGroup(dep) {
+  const d = String(dep || "").toUpperCase();
+  if (/^ER\b/.test(d)) return "ER";
+  if (d.includes("IN-PATIENT") || d.includes("INPATIENT")) return "IN-PATIENT";
+  if (d.includes("DAY CARE") || d.includes("DAY-CARE") || d.includes("DAY SURGERY") || d.includes("SURGICAL")) return "DAY-CARE";
+  if (d === "ALL") return "ALL";
+  return "UNSPECIFIED";
+}
+const QUESTION_SETS = [
+  { id: "all", name: "All", desc: "Every question in the question bank.",
+    include: (g) => true },
+  { id: "er", name: "ER", desc: "Excludes In-Patient, Day Surgery and Surgical questions.",
+    include: (g) => g !== "IN-PATIENT" && g !== "DAY-CARE" },
+  { id: "inpatient", name: "In-Patient", desc: "Excludes ER questions.",
+    include: (g) => g !== "ER" }
+];
+const MODES = [
+  { id: "self", name: "Self-Assessment",
+    desc: "The staff member answers multiple-choice and true/false questions; answers are checked automatically." },
+  { id: "interview", name: "Interviewer / Assessor",
+    desc: "You ask each question aloud, see the expected answer, and rate the response MET, PARTIALLY MET or NOT MET." }
+];
+/* Evaluation scale (both modes). Self-Assessment: correct = MET, incorrect = NOT MET. */
+const RESULTS = {
+  MET:     { label: "MET",           score: 2, cls: "met" },
+  PARTIAL: { label: "PARTIALLY MET", score: 1, cls: "partial" },
+  NOT_MET: { label: "NOT MET",       score: 0, cls: "notmet" }
+};
+/* Standard-level result: one status throughout = that status; any mix = PARTIALLY MET. */
+function standardResult(statuses) {
+  const set = new Set(statuses);
+  return set.size === 1 ? statuses[0] : "PARTIAL";
+}
 
 /* ===================================================================== */
 (function () {
@@ -820,16 +1160,20 @@ const DEPARTMENTS = [
   const $ = (id) => document.getElementById(id);
   const LETTERS = ["A", "B", "C", "D", "E", "F"];
   const TYPE_LABEL = { mcq: "Multiple Choice", tf: "True / False", multi: "Multiple Select" };
+  const EXCEL_BY_ID = Object.fromEntries(EXCEL_QUESTIONS.map(x => [x.id, x]));
+  const EXCEL_ORDER = EXCEL_QUESTIONS.map(x => x.id);
 
   // ---- state (in memory only; nothing is stored or sent anywhere) ----
-  let quiz = [];          // [{ q, options: [shuffled] }]
-  let answers = [];       // option id | true | false | null
-  let flags = [];         // booleans
+  let quiz = [];          // session items (see buildItems)
+  let answers = [];       // self: option id | true | false | [ids] | null; interview: "MET" | "PARTIAL" | "NOT_MET" | null
+  let flags = [];
   let idx = 0;
-  let lastSettings = { count: "all", shuffle: true, dept: "all" };
-  let selectedDept = null;      // department chosen on the department screen
+  let session = null;     // { mode, set, deptName, count, shuffle, start, finish }
+  let timerId = null;
+  let setup = { mode: null, set: null };
   let currentScreen = "homeScreen";
   let profileReturn = "homeScreen";
+  let profileScroll = 0;
   let reviewFilter = "all";
 
   function shuffle(arr) {
@@ -840,152 +1184,200 @@ const DEPARTMENTS = [
     }
     return a;
   }
+  const stdKey = (s) => String(s).replace(/\s+/g, "");
+  const compareStd = (a, b) => stdKey(a).localeCompare(stdKey(b), "en", { numeric: true, sensitivity: "base" });
 
-  const SCREENS = ["homeScreen", "deptScreen", "quizScreen", "resultsScreen", "reviewScreen", "profileScreen"];
+  const SCREENS = ["homeScreen", "setupScreen", "quizScreen", "reportScreen", "reviewScreen", "profileScreen"];
   function show(screen) {
     currentScreen = screen;
     SCREENS.forEach(s => $(s).classList.toggle("hidden", s !== screen));
     window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
   }
 
+  // ---------------- Pools ----------------
+  function selfPool(setId) {
+    const set = QUESTION_SETS.find(s => s.id === setId);
+    return QUESTION_BANK.filter(q => set.include(depGroup(EXCEL_BY_ID[q.excel].dep)));
+  }
+  function interviewPool(setId) {
+    const set = QUESTION_SETS.find(s => s.id === setId);
+    return EXCEL_QUESTIONS.filter(x => set.include(depGroup(x.dep)));
+  }
+  function pool(mode, setId) { return mode === "interview" ? interviewPool(setId) : selfPool(setId); }
+
   // ---------------- Home ----------------
   function initHome() {
-    const total = QUESTION_BANK.length;
-    $("statTotal").textContent = total;
-    $("statMcq").textContent = QUESTION_BANK.filter(q => q.type === "mcq" || q.type === "multi").length;
-    $("statTf").textContent = QUESTION_BANK.filter(q => q.type === "tf").length;
-
+    $("statStd").textContent = new Set(EXCEL_QUESTIONS.map(x => x.std)).size;
+    $("statSelf").textContent = QUESTION_BANK.length;
+    $("statInt").textContent = EXCEL_QUESTIONS.length;
     const sel = $("countSelect");
     sel.innerHTML = "";
     const optAll = document.createElement("option");
     optAll.value = "all"; optAll.textContent = "All Questions";
     sel.appendChild(optAll);
-    [5, 10, 15, 20, 25, 30].filter(n => n < total).forEach(n => {
+    [5, 10, 15, 20, 25, 30].forEach(n => {
       const o = document.createElement("option");
       o.value = String(n); o.textContent = n + " questions (random selection)";
       sel.appendChild(o);
     });
   }
 
-  // ---------------- Department ----------------
-  function deptById(id) { return DEPARTMENTS.find(d => d.id === id); }
-  function deptPool(id) { return QUESTION_BANK.filter(deptById(id).include); }
-
-  function renderDept() {
-    const grid = $("deptGrid");
-    grid.innerHTML = "";
-    DEPARTMENTS.forEach(d => {
-      const b = document.createElement("button");
-      b.type = "button";
-      b.className = "dept-card" + (selectedDept === d.id ? " selected" : "");
-      b.setAttribute("role", "radio");
-      b.setAttribute("aria-checked", selectedDept === d.id ? "true" : "false");
-      const n = deptPool(d.id).length;
-      b.innerHTML = '<span class="d-check"></span><span class="d-name"></span><span class="d-desc"></span><span class="d-count"></span>';
-      b.querySelector(".d-name").textContent = d.name;
-      b.querySelector(".d-desc").textContent = d.desc;
-      b.querySelector(".d-count").textContent = n + " questions";
-      b.addEventListener("click", () => { selectedDept = d.id; renderDept(); });
-      grid.appendChild(b);
+  // ---------------- Setup ----------------
+  function renderSetup() {
+    const mg = $("modeGrid");
+    mg.innerHTML = "";
+    MODES.forEach(m => mg.appendChild(choiceCard(m.name, m.desc, null, setup.mode === m.id, () => { setup.mode = m.id; renderSetup(); })));
+    const dg = $("deptGrid");
+    dg.innerHTML = "";
+    QUESTION_SETS.forEach(d => {
+      const count = setup.mode ? pool(setup.mode, d.id).length + " questions" : null;
+      dg.appendChild(choiceCard(d.name, d.desc, count, setup.set === d.id, () => { setup.set = d.id; renderSetup(); }));
     });
+    updateBegin();
+  }
+  function choiceCard(name, desc, count, selected, onClick) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "dept-card" + (selected ? " selected" : "");
+    b.setAttribute("role", "radio");
+    b.setAttribute("aria-checked", selected ? "true" : "false");
+    b.innerHTML = '<span class="d-check"></span><span class="d-name"></span><span class="d-desc"></span>';
+    b.querySelector(".d-name").textContent = name;
+    b.querySelector(".d-desc").textContent = desc;
+    if (count) { const c = document.createElement("span"); c.className = "d-count"; c.textContent = count; b.appendChild(c); }
+    b.addEventListener("click", onClick);
+    return b;
+  }
+  function updateBegin() {
+    const name = $("deptNameInput").value.trim();
     const begin = $("beginBtn");
-    begin.disabled = !selectedDept;
-    begin.textContent = selectedDept ? "Start Quiz — " + deptById(selectedDept).name : "Select a department";
+    let msg = "";
+    if (!name) msg = "Enter the department name";
+    else if (!setup.mode) msg = "Select an assessment mode";
+    else if (!setup.set) msg = "Select a question set";
+    begin.disabled = !!msg;
+    begin.textContent = msg || "Start Assessment";
   }
 
-  function setDeptLabels(id) {
-    document.querySelectorAll(".deptName").forEach(el => { el.textContent = deptById(id).name; });
-  }
-
-  function startQuiz(settings) {
-    lastSettings = settings;
-    const deptAll = deptPool(settings.dept);
-    let pool = deptAll.slice();
-    setDeptLabels(settings.dept);
-    if (settings.count !== "all" && parseInt(settings.count, 10) < pool.length) {
-      pool = shuffle(pool).slice(0, parseInt(settings.count, 10));
-      if (!settings.shuffle) {
-        const order = QUESTION_BANK.map(q => q.id);
-        pool.sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
-      }
-    } else if (settings.shuffle) {
-      pool = shuffle(pool);
+  // ---------------- Session ----------------
+  function startAssessment(cfg) {
+    session = Object.assign({}, cfg, { start: new Date(), finish: null });
+    let items = pool(cfg.mode, cfg.set).slice();
+    if (cfg.count !== "all" && parseInt(cfg.count, 10) < items.length) items = shuffle(items).slice(0, parseInt(cfg.count, 10));
+    if (cfg.mode === "interview") {
+      // Interviewer mode keeps questions in standard order, so follow-up questions stay with their standard.
+      items.sort((a, b) => compareStd(a.std, b.std) || EXCEL_ORDER.indexOf(a.id) - EXCEL_ORDER.indexOf(b.id));
+      quiz = items.map(x => ({ kind: "interview", x, std: x.std, dep: x.dep, text: x.question }));
+    } else {
+      if (cfg.shuffle) items = shuffle(items);
+      else { const order = QUESTION_BANK.map(q => q.id); items.sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id)); }
+      // Options are shuffled by object, so the answer key (by option id) never changes.
+      quiz = items.map(q => {
+        const x = EXCEL_BY_ID[q.excel];
+        return { kind: "self", q, std: x.std, dep: x.dep, text: q.text,
+          options: q.type === "tf" ? [{ id: true, text: "True" }, { id: false, text: "False" }]
+                 : (q.fixedOrder ? q.options.slice() : shuffle(q.options)) };
+      });
     }
-    // Options are shuffled by object, so the answer key (by option id) never changes.
-    quiz = pool.map(q => ({
-      q,
-      options: q.type === "tf" ? [{ id: true, text: "True" }, { id: false, text: "False" }]
-             : (q.fixedOrder ? q.options.slice() : shuffle(q.options))
-    }));
     answers = quiz.map(() => null);
     flags = quiz.map(() => false);
     idx = 0;
-    buildNavigator();
+    setLabels();
+    startTimer();
     renderQuestion();
     show("quizScreen");
   }
+  function setLabels() {
+    const set = QUESTION_SETS.find(s => s.id === session.set);
+    document.querySelectorAll(".deptName").forEach(el => { el.textContent = session.deptName; });
+    document.querySelectorAll(".setName").forEach(el => { el.textContent = set.name; });
+    document.querySelectorAll(".modeName").forEach(el => { el.textContent = MODES.find(m => m.id === session.mode).name; });
+  }
 
-  // ---------------- Quiz ----------------
+  // ---------------- Stopwatch (elapsed time only — never a limit) ----------------
+  function fmtDuration(ms) {
+    const t = Math.max(0, Math.floor(ms / 1000));
+    const h = Math.floor(t / 3600), m = Math.floor((t % 3600) / 60), s = t % 60;
+    return [h, m, s].map(n => String(n).padStart(2, "0")).join(":");
+  }
+  function tick() { $("timerText").textContent = fmtDuration(Date.now() - session.start.getTime()); }
+  function startTimer() { stopTimer(); tick(); timerId = setInterval(tick, 1000); }
+  function stopTimer() { if (timerId) { clearInterval(timerId); timerId = null; } }
+
+  // ---------------- Question screen ----------------
   function answeredCount() { return answers.filter(a => a !== null).length; }
+  function isSelected(i, id) { const a = answers[i]; return Array.isArray(a) ? a.includes(id) : a === id; }
 
   function renderQuestion() {
     const item = quiz[idx];
     const total = quiz.length;
+    const isInt = item.kind === "interview";
     $("qCount").textContent = "Question " + (idx + 1) + " of " + total;
-    $("qType").textContent = TYPE_LABEL[item.q.type];
+    $("qType").textContent = isInt ? "Interviewer" : TYPE_LABEL[item.q.type];
 
     const qText = $("qText");
     qText.innerHTML = "";
-    if (item.q.type === "tf" || item.q.type === "multi") {
+    if (!isInt && (item.q.type === "tf" || item.q.type === "multi")) {
       const lead = document.createElement("span");
       lead.className = "tf-lead"; lead.textContent = item.q.type === "tf" ? "True or False?" : "Select all that apply.";
       qText.appendChild(lead);
     }
-    qText.appendChild(document.createTextNode(item.q.text));
+    if (isInt) {
+      const lead = document.createElement("span");
+      lead.className = "tf-lead"; lead.textContent = "Ask the staff member";
+      qText.appendChild(lead);
+    }
+    qText.appendChild(document.createTextNode(item.text));
 
     const box = $("qOptions");
     box.innerHTML = "";
-    box.className = "options" + (item.q.type === "tf" ? " tf" : item.q.type === "multi" ? " multi" : "");
-    item.options.forEach((opt, i) => {
-      const b = document.createElement("button");
-      b.type = "button";
-      const on = isSelected(idx, opt.id);
-      b.className = "opt" + (on ? " selected" : "");
-      if (item.q.type === "multi") { b.setAttribute("role", "checkbox"); b.setAttribute("aria-checked", on ? "true" : "false"); }
-      else b.setAttribute("aria-pressed", on ? "true" : "false");
-      if (item.q.type !== "tf") {
-        const l = document.createElement("span"); l.className = "letter"; l.textContent = LETTERS[i];
-        b.appendChild(l);
-      }
-      const t = document.createElement("span"); t.textContent = opt.text;
-      b.appendChild(t);
-      b.addEventListener("click", () => selectAnswer(opt.id));
-      box.appendChild(b);
-    });
+    $("expectedBox").classList.toggle("hidden", !isInt);
+    $("evalBox").classList.toggle("hidden", !isInt);
+    box.classList.toggle("hidden", isInt);
+
+    if (isInt) {
+      $("expectedText").textContent = item.x.answer;
+      Array.from($("evalBox").querySelectorAll(".eval-btn")).forEach(b => {
+        const on = answers[idx] === b.dataset.result;
+        b.classList.toggle("selected", on);
+        b.setAttribute("aria-checked", on ? "true" : "false");
+      });
+    } else {
+      box.className = "options" + (item.q.type === "tf" ? " tf" : item.q.type === "multi" ? " multi" : "");
+      item.options.forEach((opt, i) => {
+        const b = document.createElement("button");
+        b.type = "button";
+        const on = isSelected(idx, opt.id);
+        b.className = "opt" + (on ? " selected" : "");
+        if (item.q.type === "multi") { b.setAttribute("role", "checkbox"); b.setAttribute("aria-checked", on ? "true" : "false"); }
+        else b.setAttribute("aria-pressed", on ? "true" : "false");
+        if (item.q.type !== "tf") {
+          const l = document.createElement("span"); l.className = "letter"; l.textContent = LETTERS[i];
+          b.appendChild(l);
+        }
+        const t = document.createElement("span"); t.textContent = opt.text;
+        b.appendChild(t);
+        b.addEventListener("click", () => selectAnswer(opt.id));
+        box.appendChild(b);
+      });
+    }
 
     $("flagBtn").classList.toggle("on", flags[idx]);
     $("flagBtn").setAttribute("aria-pressed", flags[idx] ? "true" : "false");
     $("flagLabel").textContent = flags[idx] ? "Marked for review" : "Mark for review";
+    $("clearBtn").textContent = isInt ? "Clear evaluation" : "Clear answer";
     $("clearBtn").classList.toggle("hidden", answers[idx] === null);
 
     $("prevBtn").disabled = idx === 0;
-    $("nextBtn").textContent = idx === total - 1 ? "Finish Quiz" : "Next";
+    $("nextBtn").textContent = idx === total - 1 ? "Finish Assessment" : "Next";
 
     const card = $("qCard");
     card.classList.remove("q-card"); void card.offsetWidth; card.classList.add("q-card");
-
     updateProgress();
-    updateNavigator();
-  }
-
-  function isSelected(i, id) {
-    const a = answers[i];
-    return Array.isArray(a) ? a.includes(id) : a === id;
   }
 
   function selectAnswer(id) {
     if (quiz[idx].q.type === "multi") {
-      // toggle; keep the selection in the options' display order; empty = unanswered
       const cur = Array.isArray(answers[idx]) ? answers[idx] : [];
       const next = cur.includes(id) ? cur.filter(x => x !== id) : cur.concat(id);
       const order = quiz[idx].options.map(o => o.id);
@@ -996,54 +1388,47 @@ const DEPARTMENTS = [
     }
     renderQuestion();
   }
+  function setEvaluation(result) {
+    answers[idx] = result;      // can be changed any time before finishing; "Clear evaluation" removes it
+    renderQuestion();
+  }
 
   function updateProgress() {
     const done = answeredCount(), total = quiz.length;
     const pct = total ? Math.round(done / total * 100) : 0;
     $("progressFill").style.width = pct + "%";
-    $("progressText").textContent = done + " of " + total + " answered";
+    $("progressText").textContent = done + " of " + total + (session.mode === "interview" ? " evaluated" : " answered");
     const bar = $("progressBar");
     bar.setAttribute("aria-valuemax", String(total));
     bar.setAttribute("aria-valuenow", String(done));
   }
 
-  function buildNavigator() {
-    const grid = $("navGrid");
-    grid.innerHTML = "";
-    quiz.forEach((_, i) => {
-      const b = document.createElement("button");
-      b.type = "button"; b.className = "nav-dot"; b.textContent = i + 1;
-      b.setAttribute("aria-label", "Go to question " + (i + 1));
-      b.addEventListener("click", () => { idx = i; renderQuestion(); });
-      grid.appendChild(b);
-    });
-  }
-
-  function updateNavigator() {
-    Array.from($("navGrid").children).forEach((b, i) => {
-      b.classList.toggle("answered", answers[i] !== null);
-      b.classList.toggle("current", i === idx);
-      b.classList.toggle("flagged", flags[i]);
-    });
-  }
-
   function requestFinish() {
-    const unanswered = answers.filter(a => a === null).length;
-    const flagged = flags.filter(Boolean).length;
-    if (unanswered === 0 && flagged === 0) {
-      openModal("Submit quiz?", "You have answered all " + quiz.length + " questions.", [
-        { label: "Keep reviewing", cls: "m-cancel", fn: closeModal },
-        { label: "Submit", cls: "m-confirm", fn: () => { closeModal(); finish(); } }
+    const outstanding = answers.map((a, i) => a === null ? i : -1).filter(i => i >= 0);
+    const flagged = flags.map((f, i) => f ? i : -1).filter(i => i >= 0);
+    const verb = session.mode === "interview" ? "evaluated" : "answered";
+    if (outstanding.length) {
+      const nums = outstanding.map(i => i + 1);
+      const list = nums.length > 12 ? nums.slice(0, 12).join(", ") + " …" : nums.join(", ");
+      openModal("Questions still outstanding",
+        outstanding.length + (outstanding.length === 1 ? " question has" : " questions have") + " not been " + verb +
+        " yet (Question " + list + "). Every question must be " + verb + " before the report can be generated.", [
+        { label: "Keep going", cls: "m-cancel", fn: closeModal },
+        { label: "Go to first outstanding", cls: "m-confirm", fn: () => { closeModal(); idx = outstanding[0]; renderQuestion(); } }
       ]);
       return;
     }
-    const parts = [];
-    if (unanswered) parts.push(unanswered + (unanswered === 1 ? " question is" : " questions are") + " unanswered and will be counted as not correct");
-    if (flagged) parts.push(flagged + (flagged === 1 ? " question is" : " questions are") + " marked for review");
-    const firstTarget = unanswered ? answers.findIndex(a => a === null) : flags.findIndex(Boolean);
-    openModal("Before you submit", parts.join(". ") + ".", [
-      { label: unanswered ? "Go to first unanswered" : "Go to marked question", cls: "m-cancel", fn: () => { closeModal(); idx = firstTarget; renderQuestion(); } },
-      { label: "Submit anyway", cls: "m-confirm", fn: () => { closeModal(); finish(); } }
+    if (flagged.length) {
+      openModal("Questions marked for review",
+        flagged.length + (flagged.length === 1 ? " question is" : " questions are") + " marked for review. You can still change them before finishing.", [
+        { label: "Go to marked question", cls: "m-cancel", fn: () => { closeModal(); idx = flagged[0]; renderQuestion(); } },
+        { label: "Finish Assessment", cls: "m-confirm", fn: () => { closeModal(); finish(); } }
+      ]);
+      return;
+    }
+    openModal("Finish assessment?", "All " + quiz.length + " questions have been " + verb + ". The stopwatch will stop and the report will be generated.", [
+      { label: "Keep reviewing", cls: "m-cancel", fn: closeModal },
+      { label: "Finish Assessment", cls: "m-confirm", fn: () => { closeModal(); finish(); } }
     ]);
   }
 
@@ -1058,47 +1443,204 @@ const DEPARTMENTS = [
     }
     return a === key.correct;
   }
-
-  function finish() {
-    const total = quiz.length;
-    let correct = 0, incorrect = 0, skipped = 0;
-    quiz.forEach((_, i) => {
-      if (answers[i] === null) skipped++;
-      else if (isCorrect(i)) correct++;
-      else incorrect++;
-    });
-    const pct = total ? Math.round(correct / total * 100) : 0;
-    $("resScore").textContent = correct + " / " + total;
-    $("resPct").textContent = pct + "%";
-    $("resCorrect").textContent = correct;
-    $("resIncorrect").textContent = incorrect;
-    $("resSkipped").textContent = skipped;
-    $("resSub").textContent = "Percentage = correct answers ÷ all " + total + " questions in this quiz" + (skipped ? " (unanswered questions count as not correct)." : ".");
-    const C = 326.73;
-    $("ringArc").setAttribute("stroke-dashoffset", String(C - C * pct / 100));
-    reviewFilter = "all";
-    show("resultsScreen");
+  function resultOf(i) {
+    if (answers[i] === null) return null;
+    if (quiz[i].kind === "interview") return answers[i];
+    return isCorrect(i) ? "MET" : "NOT_MET";
   }
 
-  // ---------------- Review ----------------
+  function finish() {
+    stopTimer();
+    session.finish = new Date();
+    $("timerText").textContent = fmtDuration(session.finish - session.start);
+    buildReport();
+    show("reportScreen");
+  }
+
+  // ---------------- Report ----------------
+  const fmtDate = (d) => d.toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" });
+  const fmtTime = (d) => d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  function el(tag, cls, text) {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text !== undefined && text !== null) e.textContent = text;
+    return e;
+  }
+  function badge(result) { return el("span", "badge " + RESULTS[result].cls, RESULTS[result].label); }
+  function multiline(parent, text) {
+    String(text).split("\n").forEach((line, n) => { if (n) parent.appendChild(document.createElement("br")); parent.appendChild(document.createTextNode(line)); });
+    return parent;
+  }
+  function questionLabel(item) {
+    if (item.kind === "interview") return item.text;
+    return (item.q.type === "tf" ? "True or False? " : "") + item.text + (item.q.type === "multi" ? " (Select all that apply.)" : "");
+  }
+
+  function computeReport() {
+    const rows = quiz.map((item, i) => ({ item, i, result: resultOf(i), score: RESULTS[resultOf(i)].score }));
+    const groups = new Map();
+    rows.forEach(r => { if (!groups.has(r.item.std)) groups.set(r.item.std, []); groups.get(r.item.std).push(r); });
+    const standards = Array.from(groups.keys()).sort(compareStd).map(std => {
+      const qs = groups.get(std);
+      return { std, rows: qs, result: standardResult(qs.map(r => r.result)) };
+    });
+    const count = (arr, key) => ({ MET: arr.filter(x => x[key] === "MET").length, PARTIAL: arr.filter(x => x[key] === "PARTIAL").length, NOT_MET: arr.filter(x => x[key] === "NOT_MET").length });
+    const score = rows.reduce((s, r) => s + r.score, 0);
+    return { rows, standards, stdCounts: count(standards, "result"), qCounts: count(rows, "result"), score, max: rows.length * 2 };
+  }
+
+  function buildReport() {
+    const R = computeReport();
+    const doc = $("reportDoc");
+    doc.innerHTML = "";
+    const isInt = session.mode === "interview";
+    const set = QUESTION_SETS.find(s => s.id === session.set);
+    const mode = MODES.find(m => m.id === session.mode);
+
+    // Header
+    const head = el("header", "rp-head");
+    head.appendChild(el("h1", "rp-title", "Nursing Tracer Assessment Report"));
+    head.appendChild(el("p", "rp-sub", session.deptName + " · " + fmtDate(session.start)));
+    doc.appendChild(head);
+
+    // Assessment information
+    const info = section(doc, "Assessment Information");
+    const t = el("table", "rp-info");
+    [["Department Name", session.deptName], ["Assessment Date", fmtDate(session.start)], ["Start Time", fmtTime(session.start)],
+     ["Finish Time", fmtTime(session.finish)], ["Total Duration", fmtDuration(session.finish - session.start)],
+     ["Assessment Mode", mode.name], ["Question Set", set.name]].forEach(([k, v]) => {
+      const tr = el("tr"); tr.appendChild(el("th", null, k)); tr.appendChild(el("td", null, v)); t.appendChild(tr);
+    });
+    info.appendChild(t);
+
+    // Overall summary
+    const sum = section(doc, "Overall Report Summary");
+    const grid = el("div", "rp-sum");
+    const block = (title, items) => {
+      const b = el("div", "rp-sum-block"); b.appendChild(el("h3", null, title));
+      const g = el("div", "rp-tiles");
+      items.forEach(([label, value, cls]) => { const tl = el("div", "rp-tile " + (cls || "")); tl.appendChild(el("b", null, String(value))); tl.appendChild(el("span", null, label)); g.appendChild(tl); });
+      b.appendChild(g); return b;
+    };
+    grid.appendChild(block("Standards", [["Assessed", R.standards.length], ["MET", R.stdCounts.MET, "met"], ["PARTIALLY MET", R.stdCounts.PARTIAL, "partial"], ["NOT MET", R.stdCounts.NOT_MET, "notmet"]]));
+    grid.appendChild(block("Questions", [["Assessed", R.rows.length], ["MET", R.qCounts.MET, "met"], ["PARTIALLY MET", R.qCounts.PARTIAL, "partial"], ["NOT MET", R.qCounts.NOT_MET, "notmet"]]));
+    const pct = R.max ? Math.round(R.score / R.max * 100) : 0;
+    grid.appendChild(block("Score", [["Score obtained", R.score], ["Maximum possible", R.max], ["Overall percentage", pct + "%"]]));
+    sum.appendChild(grid);
+    sum.appendChild(el("p", "rp-note", "Scoring: MET = 2, PARTIALLY MET = 1, NOT MET = 0. A standard is MET or NOT MET only when all of its questions share that result; any mix of results makes the standard PARTIALLY MET." +
+      (isInt ? "" : " In Self-Assessment, a correct answer is MET and an incorrect answer is NOT MET.")));
+
+    // Standards summary table
+    const ss = section(doc, "Standards Summary");
+    const st = el("table", "rp-table");
+    const sh = el("tr"); ["Standard", "Questions", "MET", "PARTIALLY MET", "NOT MET", "Overall Result"].forEach(h => sh.appendChild(el("th", null, h)));
+    st.appendChild(el("thead")).appendChild(sh);
+    const sb = el("tbody");
+    R.standards.forEach(s => {
+      const c = { MET: 0, PARTIAL: 0, NOT_MET: 0 }; s.rows.forEach(r => c[r.result]++);
+      const tr = el("tr", s.result !== "MET" ? "flag-row " + RESULTS[s.result].cls : null);
+      tr.appendChild(el("td", "std-cell", s.std));
+      [s.rows.length, c.MET, c.PARTIAL, c.NOT_MET].forEach(v => tr.appendChild(el("td", "num", String(v))));
+      const td = el("td"); td.appendChild(badge(s.result)); tr.appendChild(td);
+      sb.appendChild(tr);
+    });
+    st.appendChild(sb);
+    ss.appendChild(wrapTable(st));
+
+    // Findings requiring action
+    const fa = section(doc, "Findings Requiring Action");
+    const flagged = R.standards.filter(s => s.rows.some(r => r.result !== "MET"));
+    if (!flagged.length) fa.appendChild(el("p", "rp-allmet", "All assessed questions were MET. No findings require action."));
+    flagged.forEach(s => {
+      const box = el("div", "rp-action");
+      const h = el("div", "rp-action-head"); h.appendChild(el("span", "std-cell", "Standard " + s.std)); h.appendChild(badge(s.result));
+      box.appendChild(h);
+      const ul = el("ul");
+      s.rows.filter(r => r.result !== "MET").forEach(r => {
+        const li = el("li"); li.appendChild(badge(r.result)); li.appendChild(document.createTextNode(" " + questionLabel(r.item)));
+        ul.appendChild(li);
+      });
+      box.appendChild(ul);
+      fa.appendChild(box);
+    });
+
+    // Detailed findings by standard
+    const df = section(doc, "Detailed Findings by Standard");
+    R.standards.forEach(s => {
+      const wrap = el("div", "rp-std");
+      const h = el("div", "rp-std-head");
+      h.appendChild(el("h3", null, "Standard: " + s.std));
+      const ov = el("span", "rp-std-ov"); ov.appendChild(document.createTextNode("Overall Result: ")); ov.appendChild(badge(s.result));
+      h.appendChild(ov);
+      wrap.appendChild(h);
+      const tb = el("table", "rp-table rp-detail");
+      const hr = el("tr"); ["Question", "Individual Result", "Score"].forEach(x => hr.appendChild(el("th", null, x)));
+      tb.appendChild(el("thead")).appendChild(hr);
+      const body = el("tbody");
+      s.rows.forEach(r => {
+        const tr = el("tr", r.result !== "MET" ? "flag-row " + RESULTS[r.result].cls : null);
+        const qtd = el("td", "q-cell");
+        qtd.appendChild(el("div", "q-main", questionLabel(r.item)));
+        if (r.item.kind === "interview") {
+          const ex = el("div", "q-extra"); ex.appendChild(el("small", null, "Expected answer")); multiline(ex, r.item.x.answer); qtd.appendChild(ex);
+        } else {
+          const key = ANSWER_KEY[r.item.q.id];
+          const ya = el("div", "q-extra"); ya.appendChild(el("small", null, "Answer given")); multiline(ya, optionText(r.item, answers[r.i])); qtd.appendChild(ya);
+          if (r.result !== "MET") { const ca = el("div", "q-extra"); ca.appendChild(el("small", null, "Correct answer")); multiline(ca, optionText(r.item, key.correct)); qtd.appendChild(ca); }
+        }
+        tr.appendChild(qtd);
+        const rtd = el("td"); rtd.appendChild(badge(r.result)); tr.appendChild(rtd);
+        tr.appendChild(el("td", "num", String(r.score)));
+        body.appendChild(tr);
+      });
+      tb.appendChild(body);
+      wrap.appendChild(wrapTable(tb));
+      df.appendChild(wrap);
+    });
+
+    const foot = el("p", "rp-foot", "Generated " + fmtDate(session.finish) + " " + fmtTime(session.finish) + " · Nursing Tracer Assessment Tool · © 2026 Wejdan Boharam");
+    doc.appendChild(foot);
+
+    $("reviewBtn").classList.toggle("hidden", isInt);
+    $("retakeBtn").classList.toggle("hidden", isInt);
+  }
+  function section(parent, title) {
+    const s = el("section", "rp-sec"); s.appendChild(el("h2", null, title)); parent.appendChild(s); return s;
+  }
+  function wrapTable(t) { const w = el("div", "rp-table-wrap"); w.appendChild(t); return w; }
+
+  // ---------------- Print / PDF ----------------
+  function reportFileTitle() {
+    const d = session.start;
+    const iso = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+    return "Nursing Tracer Assessment Report - " + session.deptName.replace(/[\\/:*?"<>|]+/g, " ").trim() + " - " + iso;
+  }
+  function printReport() {
+    const original = document.title;
+    document.title = reportFileTitle();          // becomes the default PDF file name
+    const restore = () => { document.title = original; window.removeEventListener("afterprint", restore); };
+    window.addEventListener("afterprint", restore);
+    window.print();
+  }
+  function savePdf() {
+    openModal("Save as PDF", "The print window will open. Choose “Save as PDF” (or “Microsoft Print to PDF”) as the printer/destination, then click Save.", [
+      { label: "Cancel", cls: "m-cancel", fn: closeModal },
+      { label: "Continue", cls: "m-confirm", fn: () => { closeModal(); printReport(); } }
+    ]);
+  }
+
+  // ---------------- Review (Self-Assessment) ----------------
   function optionText(item, id) {
+    if (id === null || id === undefined) return "Not answered";
     if (Array.isArray(id)) {
-      // multi-select: one line per option, lettered as displayed in the quiz
-      return item.options
-        .map((o, n) => id.includes(o.id) ? LETTERS[n] + ". " + o.text : null)
-        .filter(Boolean).join("\n");
+      return item.options.map((o, n) => id.includes(o.id) ? LETTERS[n] + ". " + o.text : null).filter(Boolean).join("\n");
     }
     const o = item.options.find(x => x.id === id);
     return o ? o.text : "";
   }
 
   function renderReview() {
-    const filters = [
-      { key: "all", label: "All" },
-      { key: "bad", label: "Incorrect" },
-      { key: "skip", label: "Unanswered" },
-      { key: "flag", label: "Marked" }
-    ];
+    const filters = [ { key: "all", label: "All" }, { key: "bad", label: "Incorrect" }, { key: "flag", label: "Marked" } ];
     const fbox = $("filters");
     fbox.innerHTML = "";
     filters.forEach(f => {
@@ -1108,20 +1650,17 @@ const DEPARTMENTS = [
       b.addEventListener("click", () => { reviewFilter = f.key; renderReview(); });
       fbox.appendChild(b);
     });
-
     const list = $("reviewList");
     list.innerHTML = "";
     let shown = 0;
     quiz.forEach((item, i) => {
       const status = answers[i] === null ? "skip" : (isCorrect(i) ? "ok" : "bad");
       if (reviewFilter === "bad" && status !== "bad") return;
-      if (reviewFilter === "skip" && status !== "skip") return;
       if (reviewFilter === "flag" && !flags[i]) return;
       shown++;
       const key = ANSWER_KEY[item.q.id];
       const card = document.createElement("article");
       card.className = "rv " + status;
-
       const top = document.createElement("div"); top.className = "rv-top";
       const num = document.createElement("span"); num.className = "rv-num";
       num.textContent = "Question " + (i + 1) + " · " + TYPE_LABEL[item.q.type];
@@ -1129,48 +1668,32 @@ const DEPARTMENTS = [
       st.textContent = status === "ok" ? "Correct" : status === "bad" ? "Incorrect" : "Unanswered";
       top.appendChild(num); top.appendChild(st);
       card.appendChild(top);
-
       const q = document.createElement("p"); q.className = "rv-q";
-      q.textContent = (item.q.type === "tf" ? "True or False? " : "") + item.q.text + (item.q.type === "multi" ? " (Select all that apply.)" : "");
+      q.textContent = questionLabel(item);
       card.appendChild(q);
-
-      if (flags[i]) {
-        const fl = document.createElement("div"); fl.className = "rv-flag"; fl.textContent = "Marked for review";
-        card.appendChild(fl);
-      }
-
+      if (flags[i]) { const fl = document.createElement("div"); fl.className = "rv-flag"; fl.textContent = "Marked for review"; card.appendChild(fl); }
       const user = document.createElement("div");
       user.className = "ans " + (status === "ok" ? "user-ok" : status === "bad" ? "user-bad" : "user-skip");
-      addAns(user, "Your answer", answers[i] === null ? "Not answered" : optionText(item, answers[i]));
+      addAns(user, "Your answer", optionText(item, answers[i]));
       card.appendChild(user);
-
       if (status !== "ok") {
         const cor = document.createElement("div"); cor.className = "ans correct";
         addAns(cor, "Correct answer", optionText(item, key.correct));
         card.appendChild(cor);
       }
-
       if (key.answer) {
         const src = document.createElement("div"); src.className = "ans source";
         addAns(src, "Answer explanation", key.answer);
         card.appendChild(src);
       }
-
       list.appendChild(card);
     });
-    if (!shown) {
-      const e = document.createElement("div"); e.className = "empty"; e.textContent = "No questions in this view.";
-      list.appendChild(e);
-    }
+    if (!shown) { const e = document.createElement("div"); e.className = "empty"; e.textContent = "No questions in this view."; list.appendChild(e); }
   }
-
-  function addAns(el, label, text) {
+  function addAns(elm, label, text) {
     const s = document.createElement("small"); s.textContent = label;
-    el.appendChild(s);
-    String(text).split("\n").forEach((line, n) => {
-      if (n) el.appendChild(document.createElement("br"));
-      el.appendChild(document.createTextNode(line));
-    });
+    elm.appendChild(s);
+    multiline(elm, text);
   }
 
   // ---------------- Modal ----------------
@@ -1206,55 +1729,70 @@ const DEPARTMENTS = [
     }
     box.classList.toggle("hidden", !rows.length);
   }
-
   function openProfile() {
     if (currentScreen === "profileScreen") return;
     profileReturn = currentScreen;
     profileScroll = window.scrollY;
     show("profileScreen");
   }
-  let profileScroll = 0;
   function closeProfile() {
-    show(profileReturn);           // quiz state lives in memory and is untouched
+    show(profileReturn);           // assessment state lives in memory and is untouched; the stopwatch keeps running
     window.scrollTo(0, profileScroll);
   }
 
   // ---------------- Wiring ----------------
-  $("startBtn").addEventListener("click", () => { selectedDept = null; renderDept(); show("deptScreen"); });
+  function goSetup() {
+    setup = { mode: null, set: null };
+    $("deptNameInput").value = "";
+    renderSetup();
+    show("setupScreen");
+    setTimeout(() => $("deptNameInput").focus(), 0);
+  }
+  $("startBtn").addEventListener("click", goSetup);
   $("deptBackBtn").addEventListener("click", () => show("homeScreen"));
+  $("deptNameInput").addEventListener("input", updateBegin);
+  $("deptNameInput").addEventListener("keydown", (e) => { if (e.key === "Enter" && !$("beginBtn").disabled) $("beginBtn").click(); });
   $("beginBtn").addEventListener("click", () => {
-    if (!selectedDept) return;
-    startQuiz({ count: $("countSelect").value, shuffle: $("shuffleChk").checked, dept: selectedDept });
+    const deptName = $("deptNameInput").value.trim();
+    if (!deptName || !setup.mode || !setup.set) return;
+    startAssessment({ deptName, mode: setup.mode, set: setup.set, count: $("countSelect").value, shuffle: $("shuffleChk").checked });
   });
-  $("devLink").addEventListener("click", openProfile);
-  $("profileBackBtn").addEventListener("click", closeProfile);
+  $("evalBox").querySelectorAll(".eval-btn").forEach(b => b.addEventListener("click", () => setEvaluation(b.dataset.result)));
   $("prevBtn").addEventListener("click", () => { if (idx > 0) { idx--; renderQuestion(); } });
   $("nextBtn").addEventListener("click", () => { if (idx < quiz.length - 1) { idx++; renderQuestion(); } else requestFinish(); });
-  $("finishLink").addEventListener("click", requestFinish);
+  $("finishBtn").addEventListener("click", requestFinish);
   $("flagBtn").addEventListener("click", () => { flags[idx] = !flags[idx]; renderQuestion(); });
   $("clearBtn").addEventListener("click", () => { answers[idx] = null; renderQuestion(); });
-  $("reviewBtn").addEventListener("click", () => { renderReview(); show("reviewScreen"); });
-  $("retakeBtn").addEventListener("click", () => startQuiz(lastSettings));
+  $("printBtn").addEventListener("click", printReport);
+  $("pdfBtn").addEventListener("click", savePdf);
+  $("reviewBtn").addEventListener("click", () => { reviewFilter = "all"; renderReview(); show("reviewScreen"); });
+  $("retakeBtn").addEventListener("click", () => startAssessment({ deptName: session.deptName, mode: session.mode, set: session.set, count: session.count, shuffle: session.shuffle }));
+  $("newBtn").addEventListener("click", goSetup);
   $("homeBtn").addEventListener("click", () => show("homeScreen"));
-  $("backToResultsBtn").addEventListener("click", () => show("resultsScreen"));
+  $("backToResultsBtn").addEventListener("click", () => show("reportScreen"));
   $("reviewHomeBtn").addEventListener("click", () => show("homeScreen"));
+  $("devLink").addEventListener("click", openProfile);
+  $("profileBackBtn").addEventListener("click", closeProfile);
   $("modal").addEventListener("click", (e) => { if (e.target.id === "modal") closeModal(); });
 
   document.addEventListener("keydown", (e) => {
     if (!$("modal").classList.contains("hidden")) { if (e.key === "Escape") closeModal(); return; }
     if (currentScreen === "profileScreen" && e.key === "Escape") { closeProfile(); return; }
-    if ($("quizScreen").classList.contains("hidden")) return;
+    if (currentScreen !== "quizScreen") return;
     if (e.target && (e.target.tagName === "SELECT" || e.target.tagName === "INPUT")) return;
-    if (e.key === "ArrowRight") { $("nextBtn").click(); }
-    else if (e.key === "ArrowLeft") { $("prevBtn").click(); }
-    else {
-      const item = quiz[idx];
-      const k = e.key.toUpperCase();
-      let n = LETTERS.indexOf(k);
-      if (n < 0 && /^[1-6]$/.test(e.key)) n = parseInt(e.key, 10) - 1;
-      if (item.q.type === "tf") { if (k === "T") n = 0; else if (k === "F") n = 1; }
-      if (n >= 0 && n < item.options.length) selectAnswer(item.options[n].id);
+    if (e.key === "ArrowRight") { $("nextBtn").click(); return; }
+    if (e.key === "ArrowLeft") { $("prevBtn").click(); return; }
+    const item = quiz[idx];
+    const k = e.key.toUpperCase();
+    if (item.kind === "interview") {
+      const map = { M: "MET", P: "PARTIAL", N: "NOT_MET", "1": "MET", "2": "PARTIAL", "3": "NOT_MET" };
+      if (map[k]) setEvaluation(map[k]);
+      return;
     }
+    let n = LETTERS.indexOf(k);
+    if (n < 0 && /^[1-6]$/.test(e.key)) n = parseInt(e.key, 10) - 1;
+    if (item.q.type === "tf") { if (k === "T") n = 0; else if (k === "F") n = 1; }
+    if (n >= 0 && n < item.options.length) selectAnswer(item.options[n].id);
   });
 
   initHome();
