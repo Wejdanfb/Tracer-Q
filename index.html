@@ -317,7 +317,7 @@
   .expected-text { font-size: 15px; line-height: 1.6; color: var(--text); white-space: pre-line; }
   .eval { margin-top: 16px; }
   .eval-label { font-size: 13px; font-weight: 700; color: var(--primary-deep); margin-bottom: 8px; }
-  .eval-row { display:grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .eval-row { display:grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
   .eval-btn {
     padding: 14px 10px; border-radius: 12px; font-weight: 700; font-size: 14.5px; letter-spacing: .3px;
     background: #fff; border: 1.5px solid var(--border); color: var(--text); transition: background .12s, border-color .12s;
@@ -329,6 +329,9 @@
   .eval-btn.met.selected { background: var(--completed); border-color: var(--completed); color: #fff; }
   .eval-btn.partial.selected { background: #b07a12; border-color: #b07a12; color: #fff; }
   .eval-btn.notmet.selected { background: var(--missed); border-color: var(--missed); color: #fff; }
+  .eval-btn.na { color: #5f5a70; }
+  .eval-btn.na small { display:block; font-size: 11px; font-weight: 600; letter-spacing: 0; margin-top: 2px; opacity: .85; }
+  .eval-btn.na.selected { background: #6e6880; border-color: #6e6880; color: #fff; }
 
   /* ---------- Report ---------- */
   .report-actions .btn-grid + .btn-grid { margin-top: 10px; }
@@ -345,13 +348,14 @@
   .rp-info td { padding: 7px 0; color: var(--text); font-weight: 600; border-bottom: 1px solid #f0edf7; }
   .rp-sum { display:grid; gap: 14px; }
   .rp-sum-block h3 { font-size: 13px; color: var(--muted); margin: 0 0 6px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
-  .rp-tiles { display:grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .rp-tiles { display:grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
   .rp-tile { background: var(--primary-tint); border-radius: 10px; padding: 10px 8px; text-align: center; }
   .rp-tile b { display:block; font-size: 20px; color: var(--primary-deep); }
   .rp-tile span { font-size: 12px; color: var(--muted); }
   .rp-tile.met { background: var(--completed-bg); } .rp-tile.met b { color: var(--completed); }
   .rp-tile.partial { background: var(--warn-amber-bg); } .rp-tile.partial b { color: var(--warn-amber); }
   .rp-tile.notmet { background: var(--missed-bg); } .rp-tile.notmet b { color: var(--missed); }
+  .rp-tile.na { background: #f1f0f5; } .rp-tile.na b { color: #5f5a70; }
   .rp-note { font-size: 12.5px; color: var(--muted); line-height: 1.5; margin: 10px 0 0; }
   .rp-table-wrap { overflow-x: auto; }
   .rp-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
@@ -361,11 +365,13 @@
   .rp-detail th:first-child, .rp-table th:first-child { text-align: left; }
   .rp-table tr.flag-row.partial td { background: #fff8e8; }
   .rp-table tr.flag-row.notmet td { background: #fdf0ee; }
+  .rp-table tr.flag-row.na td { background: #f6f5f9; }
   .std-cell { font-weight: 700; color: var(--primary-deep); white-space: nowrap; }
   .badge { display:inline-block; font-size: 11.5px; font-weight: 800; letter-spacing: .3px; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
   .badge.met { background: var(--completed-bg); color: var(--completed); border: 1px solid #b9d8a6; }
   .badge.partial { background: var(--warn-amber-bg); color: var(--warn-amber); border: 1px solid var(--warn-amber-border); }
   .badge.notmet { background: var(--missed-bg); color: var(--missed); border: 1px solid #e3aaa4; }
+  .badge.na { background: #f1f0f5; color: #5f5a70; border: 1px solid #d3cfdd; }
   .rp-allmet { background: var(--completed-bg); color: var(--completed); border-radius: 10px; padding: 12px 14px; font-weight: 600; margin: 0; }
   .rp-action { border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; margin-top: 10px; }
   .rp-action-head { display:flex; justify-content: space-between; align-items: center; gap: 10px; }
@@ -402,9 +408,9 @@
     .stat b, .tile b { font-size: 20px; }
     .home-title { font-size: 21px; }
     .dept-grid, .mode-grid { grid-template-columns: 1fr; }
-    .eval-row { grid-template-columns: 1fr; }
+    .eval-row { grid-template-columns: 1fr 1fr; }
     .btn-grid { grid-template-columns: 1fr; }
-    .rp-tiles { grid-template-columns: repeat(2, 1fr); }
+    .rp-tiles { grid-template-columns: repeat(3, 1fr); }
   }
 </style>
 </head>
@@ -492,6 +498,7 @@
             <button type="button" class="eval-btn met" data-result="MET" role="radio">MET</button>
             <button type="button" class="eval-btn partial" data-result="PARTIAL" role="radio">PARTIALLY MET</button>
             <button type="button" class="eval-btn notmet" data-result="NOT_MET" role="radio">NOT MET</button>
+            <button type="button" class="eval-btn na" data-result="NA" role="radio" title="Not Applicable — excluded from scoring">NA<small>Not Applicable</small></button>
           </div>
         </div>
         <div class="q-tools">
@@ -1142,17 +1149,26 @@ const MODES = [
   { id: "interview", name: "Interviewer / Assessor",
     desc: "You ask each question aloud, see the expected answer, and rate the response MET, PARTIALLY MET or NOT MET." }
 ];
-/* Evaluation scale (both modes). Self-Assessment: correct = MET, incorrect = NOT MET. */
+/* Evaluation scale. Self-Assessment: correct = MET, incorrect = NOT MET.
+   NA (Not Applicable, Interviewer mode only) has no score: it is left out of the
+   score AND the maximum possible score, so it never counts against the department. */
 const RESULTS = {
-  MET:     { label: "MET",           score: 2, cls: "met" },
-  PARTIAL: { label: "PARTIALLY MET", score: 1, cls: "partial" },
-  NOT_MET: { label: "NOT MET",       score: 0, cls: "notmet" }
+  MET:     { label: "MET",           score: 2,    cls: "met" },
+  PARTIAL: { label: "PARTIALLY MET", score: 1,    cls: "partial" },
+  NOT_MET: { label: "NOT MET",       score: 0,    cls: "notmet" },
+  NA:      { label: "NA",            score: null, cls: "na" }
 };
-/* Standard-level result: one status throughout = that status; any mix = PARTIALLY MET. */
+/* Standard-level result, after removing NA questions:
+   - every question NA                 -> NA
+   - one status throughout             -> that status (MET or NOT MET; a single question keeps its own result)
+   - any mix of MET / PARTIAL / NOT MET -> PARTIALLY MET */
 function standardResult(statuses) {
-  const set = new Set(statuses);
-  return set.size === 1 ? statuses[0] : "PARTIAL";
+  const applicable = statuses.filter(s => s !== "NA");
+  if (!applicable.length) return "NA";
+  const set = new Set(applicable);
+  return set.size === 1 ? applicable[0] : "PARTIAL";
 }
+const needsAction = (result) => result === "PARTIAL" || result === "NOT_MET";
 
 /* ===================================================================== */
 (function () {
@@ -1484,9 +1500,11 @@ function standardResult(statuses) {
       const qs = groups.get(std);
       return { std, rows: qs, result: standardResult(qs.map(r => r.result)) };
     });
-    const count = (arr, key) => ({ MET: arr.filter(x => x[key] === "MET").length, PARTIAL: arr.filter(x => x[key] === "PARTIAL").length, NOT_MET: arr.filter(x => x[key] === "NOT_MET").length });
-    const score = rows.reduce((s, r) => s + r.score, 0);
-    return { rows, standards, stdCounts: count(standards, "result"), qCounts: count(rows, "result"), score, max: rows.length * 2 };
+    const count = (arr, key) => ({ MET: arr.filter(x => x[key] === "MET").length, PARTIAL: arr.filter(x => x[key] === "PARTIAL").length,
+      NOT_MET: arr.filter(x => x[key] === "NOT_MET").length, NA: arr.filter(x => x[key] === "NA").length });
+    const scored = rows.filter(r => r.result !== "NA");            // NA is excluded from score and maximum
+    const score = scored.reduce((s, r) => s + r.score, 0);
+    return { rows, standards, stdCounts: count(standards, "result"), qCounts: count(rows, "result"), score, max: scored.length * 2, scoredCount: scored.length };
   }
 
   function buildReport() {
@@ -1522,25 +1540,26 @@ function standardResult(statuses) {
       items.forEach(([label, value, cls]) => { const tl = el("div", "rp-tile " + (cls || "")); tl.appendChild(el("b", null, String(value))); tl.appendChild(el("span", null, label)); g.appendChild(tl); });
       b.appendChild(g); return b;
     };
-    grid.appendChild(block("Standards", [["Assessed", R.standards.length], ["MET", R.stdCounts.MET, "met"], ["PARTIALLY MET", R.stdCounts.PARTIAL, "partial"], ["NOT MET", R.stdCounts.NOT_MET, "notmet"]]));
-    grid.appendChild(block("Questions", [["Assessed", R.rows.length], ["MET", R.qCounts.MET, "met"], ["PARTIALLY MET", R.qCounts.PARTIAL, "partial"], ["NOT MET", R.qCounts.NOT_MET, "notmet"]]));
-    const pct = R.max ? Math.round(R.score / R.max * 100) : 0;
-    grid.appendChild(block("Score", [["Score obtained", R.score], ["Maximum possible", R.max], ["Overall percentage", pct + "%"]]));
+    grid.appendChild(block("Standards", [["Assessed", R.standards.length], ["MET", R.stdCounts.MET, "met"], ["PARTIALLY MET", R.stdCounts.PARTIAL, "partial"], ["NOT MET", R.stdCounts.NOT_MET, "notmet"], ["NA", R.stdCounts.NA, "na"]]));
+    grid.appendChild(block("Questions", [["Assessed", R.rows.length], ["MET", R.qCounts.MET, "met"], ["PARTIALLY MET", R.qCounts.PARTIAL, "partial"], ["NOT MET", R.qCounts.NOT_MET, "notmet"], ["NA", R.qCounts.NA, "na"]]));
+    const pctText = R.max ? Math.round(R.score / R.max * 100) + "%" : "N/A";
+    grid.appendChild(block("Score", [["Questions scored", R.scoredCount], ["Score obtained", R.score], ["Maximum possible", R.max], ["Overall percentage", pctText]]));
     sum.appendChild(grid);
-    sum.appendChild(el("p", "rp-note", "Scoring: MET = 2, PARTIALLY MET = 1, NOT MET = 0. A standard is MET or NOT MET only when all of its questions share that result; any mix of results makes the standard PARTIALLY MET." +
+    sum.appendChild(el("p", "rp-note", "Scoring: MET = 2, PARTIALLY MET = 1, NOT MET = 0. NA (Not Applicable) questions are excluded from the score, the maximum possible score and the percentage. " +
+      "A standard's result uses only its applicable (non-NA) questions: it is MET or NOT MET only when all of them share that result, any mix makes it PARTIALLY MET, and a standard whose questions are all NA is NA." +
       (isInt ? "" : " In Self-Assessment, a correct answer is MET and an incorrect answer is NOT MET.")));
 
     // Standards summary table
     const ss = section(doc, "Standards Summary");
     const st = el("table", "rp-table");
-    const sh = el("tr"); ["Standard", "Questions", "MET", "PARTIALLY MET", "NOT MET", "Overall Result"].forEach(h => sh.appendChild(el("th", null, h)));
+    const sh = el("tr"); ["Standard", "Questions", "MET", "PARTIALLY MET", "NOT MET", "NA", "Overall Result"].forEach(h => sh.appendChild(el("th", null, h)));
     st.appendChild(el("thead")).appendChild(sh);
     const sb = el("tbody");
     R.standards.forEach(s => {
-      const c = { MET: 0, PARTIAL: 0, NOT_MET: 0 }; s.rows.forEach(r => c[r.result]++);
+      const c = { MET: 0, PARTIAL: 0, NOT_MET: 0, NA: 0 }; s.rows.forEach(r => c[r.result]++);
       const tr = el("tr", s.result !== "MET" ? "flag-row " + RESULTS[s.result].cls : null);
       tr.appendChild(el("td", "std-cell", s.std));
-      [s.rows.length, c.MET, c.PARTIAL, c.NOT_MET].forEach(v => tr.appendChild(el("td", "num", String(v))));
+      [s.rows.length, c.MET, c.PARTIAL, c.NOT_MET, c.NA].forEach(v => tr.appendChild(el("td", "num", String(v))));
       const td = el("td"); td.appendChild(badge(s.result)); tr.appendChild(td);
       sb.appendChild(tr);
     });
@@ -1549,14 +1568,14 @@ function standardResult(statuses) {
 
     // Findings requiring action
     const fa = section(doc, "Findings Requiring Action");
-    const flagged = R.standards.filter(s => s.rows.some(r => r.result !== "MET"));
-    if (!flagged.length) fa.appendChild(el("p", "rp-allmet", "All assessed questions were MET. No findings require action."));
+    const flagged = R.standards.filter(s => s.rows.some(r => needsAction(r.result)));
+    if (!flagged.length) fa.appendChild(el("p", "rp-allmet", "No question was rated PARTIALLY MET or NOT MET. No findings require action."));
     flagged.forEach(s => {
       const box = el("div", "rp-action");
       const h = el("div", "rp-action-head"); h.appendChild(el("span", "std-cell", "Standard " + s.std)); h.appendChild(badge(s.result));
       box.appendChild(h);
       const ul = el("ul");
-      s.rows.filter(r => r.result !== "MET").forEach(r => {
+      s.rows.filter(r => needsAction(r.result)).forEach(r => {
         const li = el("li"); li.appendChild(badge(r.result)); li.appendChild(document.createTextNode(" " + questionLabel(r.item)));
         ul.appendChild(li);
       });
@@ -1586,11 +1605,11 @@ function standardResult(statuses) {
         } else {
           const key = ANSWER_KEY[r.item.q.id];
           const ya = el("div", "q-extra"); ya.appendChild(el("small", null, "Answer given")); multiline(ya, optionText(r.item, answers[r.i])); qtd.appendChild(ya);
-          if (r.result !== "MET") { const ca = el("div", "q-extra"); ca.appendChild(el("small", null, "Correct answer")); multiline(ca, optionText(r.item, key.correct)); qtd.appendChild(ca); }
+          if (needsAction(r.result)) { const ca = el("div", "q-extra"); ca.appendChild(el("small", null, "Correct answer")); multiline(ca, optionText(r.item, key.correct)); qtd.appendChild(ca); }
         }
         tr.appendChild(qtd);
         const rtd = el("td"); rtd.appendChild(badge(r.result)); tr.appendChild(rtd);
-        tr.appendChild(el("td", "num", String(r.score)));
+        tr.appendChild(el("td", "num", r.result === "NA" ? "—" : String(r.score)));
         body.appendChild(tr);
       });
       tb.appendChild(body);
@@ -1785,7 +1804,7 @@ function standardResult(statuses) {
     const item = quiz[idx];
     const k = e.key.toUpperCase();
     if (item.kind === "interview") {
-      const map = { M: "MET", P: "PARTIAL", N: "NOT_MET", "1": "MET", "2": "PARTIAL", "3": "NOT_MET" };
+      const map = { M: "MET", P: "PARTIAL", N: "NOT_MET", A: "NA", "1": "MET", "2": "PARTIAL", "3": "NOT_MET", "4": "NA" };
       if (map[k]) setEvaluation(map[k]);
       return;
     }
